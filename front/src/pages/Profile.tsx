@@ -182,7 +182,7 @@ export default function Profile() {
                 <div key={course.idCours} className="flex items-start space-x-3 pb-4 border-b last:border-b-0">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
                   <div>
-                    <p className="font-medium text-gray-900">In Progress "{course.title}"</p>
+                    <p className="font-medium text-gray-900">In Progress "{course.titre}"</p>
                     <p className="text-sm text-gray-600">Course - {course.progress}% complete</p>
                   </div>
                 </div>
