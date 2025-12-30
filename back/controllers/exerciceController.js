@@ -13,6 +13,9 @@ const transformExerciseData = (exercise) => {
         difficulte: exercise.difficulty,
         dureeEstimee: exercise.estimated_duration,
         idEnseignant: exercise.idEnseignant,
+        nomEnseignant: exercise.nomEnseignant,
+        prenomEnseignant: exercise.prenomEnseignant,
+        emailEnseignant: exercise.emailEnseignant,
         idCours: exercise.idCours,
     };
 

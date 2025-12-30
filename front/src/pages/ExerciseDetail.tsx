@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, Code, FileText, ListChecks } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Code, FileText, ListChecks, User } from 'lucide-react';
 import Quiz from '../components/Exercise/quiz';
 import CodeEditor from '../components/Exercise/MonacoEditor/MonacoEditor';
 import { exercisesApi } from '../services/api';
@@ -164,6 +164,18 @@ export default function ExerciseDetail() {
               )}
             </div>
             <h1 className="text-4xl font-bold mb-4">{exercise.titre}</h1>
+            {exercise.prenomEnseignant && exercise.nomEnseignant && (
+              <div className="flex items-center space-x-2 mt-4 bg-white/10 rounded-lg px-3 py-2 max-w-fit">
+                <User className="w-5 h-5 text-white/80" />
+                <span className="text-white/80 text-sm">Enseignant :</span>
+                <span
+                  onClick={() => navigate(`/profil-ens/${exercise.idEnseignant}`)}
+                  className="text-white font-semibold cursor-pointer hover:underline hover:text-white/90 transition"
+                >
+                  {exercise.prenomEnseignant} {exercise.nomEnseignant}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Exercise Content */}

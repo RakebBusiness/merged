@@ -15,7 +15,16 @@ const exerciceModel = {
     },
 
     async findById(id) {
-        const query = 'SELECT * FROM "EXERCISE" WHERE "id" = $1';
+        const query = `
+            SELECT
+                e.*,
+                u."Nom" AS "nomEnseignant",
+                u."Prenom" AS "prenomEnseignant",
+                u."Email" AS "emailEnseignant"
+            FROM "EXERCISE" e
+            LEFT JOIN "USER" u ON e."idEnseignant" = u."idUser"
+            WHERE e."id" = $1
+        `;
         const result = await pool.query(query, [id]);
 
         if (result.rows.length === 0) return null;
