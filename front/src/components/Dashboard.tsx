@@ -3,11 +3,12 @@ import StatsCard from './StatsCard';
 
 interface DashboardProps {
   completedExercises: number;
-  totalExercises: number;
+  enrolledExercises: number;
+  unlockedAchievements: number;
 }
 
-export default function Dashboard({ completedExercises, totalExercises }: DashboardProps) {
-  const progress = totalExercises > 0 ? Math.round((completedExercises / totalExercises) * 100) : 0;
+export default function Dashboard({ completedExercises, enrolledExercises, unlockedAchievements }: DashboardProps) {
+  const progress = enrolledExercises > 0 ? Math.round((completedExercises / enrolledExercises) * 100) : 0;
 
   return (
     <div className="space-y-6">
@@ -20,7 +21,7 @@ export default function Dashboard({ completedExercises, totalExercises }: Dashbo
         />
         <StatsCard
           icon={BookOpen}
-          value={totalExercises}
+          value={enrolledExercises}
           label="Enrolled Exercises"
           color="bg-blue-500"
         />
@@ -32,7 +33,7 @@ export default function Dashboard({ completedExercises, totalExercises }: Dashbo
         />
         <StatsCard
           icon={Award}
-          value={Math.floor(completedExercises / 3)}
+          value={unlockedAchievements}
           label="Achievements"
           color="bg-purple-500"
         />
