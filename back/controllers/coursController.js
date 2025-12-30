@@ -43,7 +43,7 @@ const coursController = {
 
     async createCourse(req, res) {
         try {
-            const { idCours, titre, niveau, description, duree, sections, topics } = req.body;
+            const { titre, niveau, description, duree, sections, topics } = req.body;
             const userId = req.userId;
             const role = req.role;
 
@@ -56,7 +56,6 @@ const coursController = {
             }
 
             const newCourse = await coursModel.create({
-                idCours,
                 titre,
                 niveau,
                 description,

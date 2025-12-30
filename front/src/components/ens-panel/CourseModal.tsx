@@ -67,7 +67,7 @@ function CourseModal({
     const formData = new FormData(e.currentTarget);
 
     const courseData = {
-      idCours: editingCourse?.idCours || parseInt(formData.get('idCours') as string),
+      ...(editingCourse?.idCours && { idCours: editingCourse.idCours }),
       titre: formData.get('titre') as string,
       niveau: formData.get('niveau') as string,
       description: formData.get('description') as string,
@@ -87,19 +87,6 @@ function CourseModal({
         </h3>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {!editingCourse && (
-            <div>
-              <label className="block text-sm font-medium mb-1">ID du cours</label>
-              <input
-                type="number"
-                name="idCours"
-                required
-                placeholder="ID unique du cours"
-                className="w-full border px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-          )}
-
           <div>
             <label className="block text-sm font-medium mb-1">Titre</label>
             <input

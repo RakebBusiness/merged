@@ -64,19 +64,19 @@ const coursModel = {
     },
 
     async create(coursData) {
-        const { idCours, titre, niveau, description, duree, idEnseignant, sections, topics } = coursData;
+        const { titre, niveau, description, duree, idEnseignant, sections, topics } = coursData;
 
         const client = await pool.connect();
         try {
             await client.query('BEGIN');
 
             const courseQuery = `
-                INSERT INTO "COURS" ("idCours", "titre", "niveau", "description", "duree", "idEnseignant")
-                VALUES ($1, $2, $3, $4, $5, $6)
+                INSERT INTO "COURS" ("titre", "niveau", "description", "duree", "idEnseignant")
+                VALUES ($1, $2, $3, $4, $5)
                 RETURNING *
             `;
             const courseResult = await client.query(courseQuery, [
-                idCours, titre, niveau, description, duree, idEnseignant
+                titre, niveau, description, duree, idEnseignant
             ]);
             const course = courseResult.rows[0];
 
