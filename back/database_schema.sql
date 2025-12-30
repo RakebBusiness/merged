@@ -235,7 +235,7 @@ VALUES
     ('Course Master', 'Complete your first course', '🏆', 150),
     ('Algorithm Expert', 'Complete 20 exercises', '💎', 500),
     ('Consistency King', 'Complete 3 courses', '👑', 300)
-ON CONFLICT DO NOTHING;
+
 
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_student_achievement_user ON "STUDENT_ACHIEVEMENT"("idUser");

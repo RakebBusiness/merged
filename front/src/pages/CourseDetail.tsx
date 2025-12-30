@@ -93,11 +93,10 @@ export default function CourseDetail() {
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-12 text-white">
             <div className="flex items-center space-x-3 mb-4">
               <span
-                className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                  course.niveau === 'Algo1'
-                    ? 'bg-green-500'
-                    : 'bg-orange-500'
-                }`}
+                className={`px-3 py-1 rounded-full text-sm font-semibold ${course.niveau === 'Algo1'
+                  ? 'bg-green-500'
+                  : 'bg-orange-500'
+                  }`}
               >
                 {course.niveau}
               </span>
@@ -110,6 +109,16 @@ export default function CourseDetail() {
             </div>
             <h1 className="text-4xl font-bold mb-4">{course.titre}</h1>
             <p className="text-xl text-blue-100">{course.description}</p>
+            <div className="flex items-center space-x-2 mt-4 bg-white rounded-lg px-2 py-2 max-w-40">
+              <BookOpen className="w-5 h-5 text-blue-200" />
+              <span className="text-blue-200 text-sm">Enseignant :</span>
+              <span
+                onClick={() => navigate(`/profil-ens/${course.idEnseignant}`)}
+                className="text-white font-semibold cursor-pointer hover:underline hover:text-blue-100 transition"
+              >
+                {course.prenomEnseignant} {course.nomEnseignant}
+              </span>
+            </div>
           </div>
 
           {course.topics && course.topics.length > 0 && (

@@ -74,11 +74,11 @@ const coursModel = {
         try {
             await client.query('BEGIN');
 
-            const courseQuery = `
-                INSERT INTO "COURS" ("titre", "niveau", "description", "duree", "idEnseignant")
-                VALUES ($1, $2, $3, $4, $5)
-                RETURNING *
-            `;
+            const courseQuery = `SELECT c.*,e."nom" AS "nomEnseignant",e."prenom" AS "prenomEnseignant",e."email" AS "emailEnseignant"
+                                    FROM "COURS" c
+                                    JOIN "ENSEIGNANT" e ON c."idEnseignant" = e."idEnseignant"
+                                    WHERE c."idCours" = $1
+                                `;
             const courseResult = await client.query(courseQuery, [
                 titre, niveau, description, duree, idEnseignant
             ]);
