@@ -208,3 +208,41 @@ export const profileApi = {
     return response.json();
   },
 };
+
+export const statisticsApi = {
+  getTeacherStats: async (teacherId: number) => {
+    const response = await fetch(`${API_BASE_URL}/statistics/teacher/${teacherId}`, {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Failed to fetch teacher statistics');
+    return response.json();
+  },
+
+  getCoursePerformance: async (teacherId: number) => {
+    const response = await fetch(`${API_BASE_URL}/statistics/courses/${teacherId}`, {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Failed to fetch course performance');
+    return response.json();
+  },
+
+  getProgressDistribution: async (teacherId: number) => {
+    const response = await fetch(`${API_BASE_URL}/statistics/progress/${teacherId}`, {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Failed to fetch progress distribution');
+    return response.json();
+  },
+
+  getRecentActivity: async (teacherId: number) => {
+    const response = await fetch(`${API_BASE_URL}/statistics/activity/${teacherId}`, {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Failed to fetch recent activity');
+    return response.json();
+  },
+};

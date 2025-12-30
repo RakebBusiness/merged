@@ -41,6 +41,7 @@ app.use('/logout', require('./routes/logout'));
 app.use('/api', require('./routes/api'));
 app.use('/courses', require('./routes/api/courses'));
 app.use('/exercises', require('./routes/api/exercises'));
+app.use('/statistics', require('./routes/api/statistics'));
 app.use('/profile', require('./routes/profile'));
 
 app.all('*', (req, res) => {
