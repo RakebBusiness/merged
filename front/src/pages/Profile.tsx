@@ -158,6 +158,7 @@ export default function Profile() {
             <Dashboard
               completedExercises={statistics.exercisesCompleted}
               enrolledExercises={statistics.totalExercisesEnrolled}
+              unlockedAchievements={achievements.totalUnlocked}
             />
           </div>
         </div>
