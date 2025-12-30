@@ -2,24 +2,110 @@ import { User, Mail, Calendar } from 'lucide-react';
 import Dashboard from '../components/Dashboard';
 import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
-import { exercisesApi } from '../services/api';
+import { profileApi } from '../services/api';
+
+interface ProfileData {
+  profile: {
+    idUser: number;
+    nom: string;
+    prenom: string;
+    email: string;
+    dateNaissance: string;
+    specialite: string;
+    annee: number;
+    level: number;
+    xp: number;
+    xpToNextLevel: number;
+  };
+  statistics: {
+    totalCoursesEnrolled: number;
+    coursesCompleted: number;
+    totalExercisesEnrolled: number;
+    exercisesCompleted: number;
+    averageScore: string;
+    progressPercentage: number;
+  };
+  courses: {
+    completed: any[];
+    inProgress: any[];
+  };
+  exercises: {
+    completed: any[];
+    inProgress: any[];
+  };
+  achievements: {
+    unlocked: Array<{
+      idAchievement: number;
+      name: string;
+      description: string;
+      icon: string;
+      xpReward: number;
+      unlockedAt: string;
+    }>;
+    locked: Array<{
+      idAchievement: number;
+      name: string;
+      description: string;
+      icon: string;
+      xpReward: number;
+    }>;
+    totalUnlocked: number;
+    totalAvailable: number;
+  };
+}
 
 export default function Profile() {
   const { user } = useAuth();
-  const [totalExercises, setTotalExercises] = useState(0);
-  const completedCount = 7;
+  const [profileData, setProfileData] = useState<ProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchExercises = async () => {
+    const fetchProfile = async () => {
       try {
-        const data = await exercisesApi.getAll();
-        setTotalExercises(data.exercices?.length || 0);
+        setLoading(true);
+        const data = await profileApi.get();
+        setProfileData(data);
+        setError(null);
       } catch (error) {
-        console.error('Error fetching exercises:', error);
+        console.error('Error fetching profile:', error);
+        setError('Failed to load profile data');
+      } finally {
+        setLoading(false);
       }
     };
-    fetchExercises();
+    fetchProfile();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !profileData) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error || 'Failed to load profile'}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const { profile, statistics, achievements } = profileData;
+  const progressToNextLevel = ((profile.xp % 100) / 100) * 100;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -36,39 +122,43 @@ export default function Profile() {
                 <User className="w-12 h-12 text-white" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-1">
-                {user?.nom} {user?.prenom}
+                {profile.nom} {profile.prenom}
               </h2>
-              <p className="text-gray-600 mb-6">
-                {user?.role === 'etudiant' ? 'Student' : 'Teacher'}
-              </p>
+              <p className="text-gray-600 mb-6">Student</p>
 
               <div className="w-full space-y-3">
                 <div className="flex items-center space-x-3 text-gray-700">
                   <Mail className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm">{user?.Email}</span>
+                  <span className="text-sm">{profile.email}</span>
                 </div>
                 <div className="flex items-center space-x-3 text-gray-700">
                   <Calendar className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm">Joined {new Date(user?.dateInscription || Date.now()).toLocaleDateString()}</span>
+                  <span className="text-sm">Year {profile.annee} - {profile.specialite}</span>
                 </div>
               </div>
 
               <div className="mt-6 w-full pt-6 border-t">
                 <h3 className="font-semibold text-gray-900 mb-3">Current Level</h3>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-2xl font-bold text-blue-600">Algo1</span>
-                  <span className="text-sm text-gray-600">Level 3</span>
+                  <span className="text-2xl font-bold text-blue-600">{profile.xp} XP</span>
+                  <span className="text-sm text-gray-600">Level {profile.level}</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-600 h-full rounded-full" style={{ width: '65%' }} />
+                  <div
+                    className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                    style={{ width: `${progressToNextLevel}%` }}
+                  />
                 </div>
-                <p className="text-xs text-gray-600 mt-2">65% to next level</p>
+                <p className="text-xs text-gray-600 mt-2">{profile.xpToNextLevel} XP to next level</p>
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-2">
-            <Dashboard completedExercises={completedCount} totalExercises={totalExercises} />
+            <Dashboard
+              completedExercises={statistics.exercisesCompleted}
+              totalExercises={statistics.totalExercisesEnrolled}
+            />
           </div>
         </div>
 
@@ -76,76 +166,61 @@ export default function Profile() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">Recent Activity</h3>
             <div className="space-y-4">
-              <div className="flex items-start space-x-3 pb-4 border-b">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2" />
-                <div>
-                  <p className="font-medium text-gray-900">Completed "Sum of Two Numbers"</p>
-                  <p className="text-sm text-gray-600">Code Exercise - 2 hours ago</p>
+              {profileData.exercises.completed.slice(0, 4).map((exercise: any, index: number) => (
+                <div key={exercise.idExercice || index} className="flex items-start space-x-3 pb-4 border-b last:border-b-0">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2" />
+                  <div>
+                    <p className="font-medium text-gray-900">Completed "{exercise.Titre}"</p>
+                    <p className="text-sm text-gray-600">
+                      {exercise.Type} - Score: {exercise.score || 'N/A'}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start space-x-3 pb-4 border-b">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2" />
-                <div>
-                  <p className="font-medium text-gray-900">Completed "Variable Declaration"</p>
-                  <p className="text-sm text-gray-600">QCM - 1 day ago</p>
+              ))}
+              {profileData.courses.inProgress.slice(0, 2).map((course: any) => (
+                <div key={course.idCours} className="flex items-start space-x-3 pb-4 border-b last:border-b-0">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
+                  <div>
+                    <p className="font-medium text-gray-900">In Progress "{course.Titre}"</p>
+                    <p className="text-sm text-gray-600">Course - {course.progress}% complete</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start space-x-3 pb-4 border-b">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2" />
-                <div>
-                  <p className="font-medium text-gray-900">Started "Control Structures" course</p>
-                  <p className="text-sm text-gray-600">Course - 2 days ago</p>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2" />
-                <div>
-                  <p className="font-medium text-gray-900">Completed "Printf Format Specifier"</p>
-                  <p className="text-sm text-gray-600">QCM - 3 days ago</p>
-                </div>
-              </div>
+              ))}
+              {profileData.exercises.completed.length === 0 && profileData.courses.inProgress.length === 0 && (
+                <p className="text-gray-500 text-center py-4">No recent activity yet</p>
+              )}
             </div>
           </div>
 
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Achievements</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
+              Achievements ({achievements.totalUnlocked}/{achievements.totalAvailable})
+            </h3>
             <div className="grid grid-cols-3 gap-4">
-              <div className="flex flex-col items-center p-4 bg-yellow-50 rounded-lg">
-                <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mb-2">
-                  <span className="text-2xl">🏆</span>
+              {achievements.unlocked.map((achievement) => (
+                <div
+                  key={achievement.idAchievement}
+                  className="flex flex-col items-center p-4 bg-yellow-50 rounded-lg"
+                  title={achievement.description}
+                >
+                  <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center mb-2">
+                    <span className="text-2xl">{achievement.icon}</span>
+                  </div>
+                  <p className="text-xs text-center text-gray-700 font-medium">{achievement.name}</p>
                 </div>
-                <p className="text-xs text-center text-gray-700 font-medium">First Steps</p>
-              </div>
-              <div className="flex flex-col items-center p-4 bg-blue-50 rounded-lg">
-                <div className="w-12 h-12 bg-blue-400 rounded-full flex items-center justify-center mb-2">
-                  <span className="text-2xl">📚</span>
+              ))}
+              {achievements.locked.map((achievement) => (
+                <div
+                  key={achievement.idAchievement}
+                  className="flex flex-col items-center p-4 bg-gray-100 rounded-lg opacity-50"
+                  title={achievement.description}
+                >
+                  <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mb-2">
+                    <span className="text-2xl">{achievement.icon}</span>
+                  </div>
+                  <p className="text-xs text-center text-gray-700 font-medium">{achievement.name}</p>
                 </div>
-                <p className="text-xs text-center text-gray-700 font-medium">Quick Learner</p>
-              </div>
-              <div className="flex flex-col items-center p-4 bg-green-50 rounded-lg">
-                <div className="w-12 h-12 bg-green-400 rounded-full flex items-center justify-center mb-2">
-                  <span className="text-2xl">💻</span>
-                </div>
-                <p className="text-xs text-center text-gray-700 font-medium">Code Master</p>
-              </div>
-              <div className="flex flex-col items-center p-4 bg-gray-100 rounded-lg opacity-50">
-                <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mb-2">
-                  <span className="text-2xl">🔒</span>
-                </div>
-                <p className="text-xs text-center text-gray-700 font-medium">Locked</p>
-              </div>
-              <div className="flex flex-col items-center p-4 bg-gray-100 rounded-lg opacity-50">
-                <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mb-2">
-                  <span className="text-2xl">🔒</span>
-                </div>
-                <p className="text-xs text-center text-gray-700 font-medium">Locked</p>
-              </div>
-              <div className="flex flex-col items-center p-4 bg-gray-100 rounded-lg opacity-50">
-                <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center mb-2">
-                  <span className="text-2xl">🔒</span>
-                </div>
-                <p className="text-xs text-center text-gray-700 font-medium">Locked</p>
-              </div>
+              ))}
             </div>
           </div>
         </div>

@@ -176,3 +176,35 @@ export const exercisesApi = {
     return response.json();
   },
 };
+
+export const profileApi = {
+  get: async () => {
+    const response = await fetch(`${API_BASE_URL}/profile`, {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Failed to fetch profile');
+    return response.json();
+  },
+
+  completeExercise: async (id: number, score: number) => {
+    const response = await fetch(`${API_BASE_URL}/profile/exercises/${id}/complete`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+      body: JSON.stringify({ score }),
+    });
+    if (!response.ok) throw new Error('Failed to complete exercise');
+    return response.json();
+  },
+
+  completeCourse: async (id: number) => {
+    const response = await fetch(`${API_BASE_URL}/profile/courses/${id}/complete`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Failed to complete course');
+    return response.json();
+  },
+};
