@@ -15,6 +15,8 @@ const profileController = {
                 return res.status(404).json({ error: 'Student profile not found' });
             }
 
+            await profileController.checkAndUnlockAchievements(userId);
+
             const enrolledCourses = await profileModel.getEnrolledCourses(userId);
             const enrolledExercises = await profileModel.getEnrolledExercises(userId);
             const achievements = await profileModel.getAchievements(userId);
