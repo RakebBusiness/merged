@@ -21,7 +21,7 @@ export default function Dashboard({ completedExercises, totalExercises }: Dashbo
         <StatsCard
           icon={BookOpen}
           value={totalExercises}
-          label="Total Exercises"
+          label="Enrolled Exercises"
           color="bg-blue-500"
         />
         <StatsCard
