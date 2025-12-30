@@ -19,8 +19,11 @@ const coursModel = {
 
         let isEnrolled = false;
         let enrollmentData = null;
+        let isTeacher = false;
 
         if (userId) {
+            isTeacher = course.idEnseignant === userId;
+
             const enrollmentQuery = `
                 SELECT "enrolledAt", "finishedAt", "progress", "completed"
                 FROM "ETUDIANT_COURS"
@@ -49,10 +52,11 @@ const coursModel = {
 
         return {
             ...course,
-            content: isEnrolled ? sectionsResult.rows : [],
+            content: (isEnrolled || isTeacher) ? sectionsResult.rows : [],
             sections: sectionsResult.rows.map(s => ({ section: s.section })),
             topics: topicsResult.rows,
             isEnrolled,
+            isTeacher,
             enrollmentData
         };
     },

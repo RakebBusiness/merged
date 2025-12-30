@@ -30,9 +30,15 @@ function CourseList() {
     setShowModal(true);
   };
 
-  const handleEdit = (course: any) => {
-    setEditingCourse(course);
-    setShowModal(true);
+  const handleEdit = async (course: any) => {
+    try {
+      const fullCourse = await coursesApi.getById(course.idCours);
+      setEditingCourse(fullCourse);
+      setShowModal(true);
+    } catch (error) {
+      console.error('Error fetching course details:', error);
+      alert('Error loading course details');
+    }
   };
 
   const handleDelete = async (id: number) => {
