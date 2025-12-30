@@ -246,3 +246,14 @@ export const statisticsApi = {
     return response.json();
   },
 };
+
+export const teachersApi = {
+  getById: async (id: number) => {
+    const response = await fetch(`${API_BASE_URL}/teachers/${id}`, {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Failed to fetch teacher profile');
+    return response.json();
+  },
+};

@@ -9,6 +9,7 @@ import CourseDetail from "./pages/CourseDetail";
 import Exercises from "./pages/Exercises";
 import ExerciseDetail from "./pages/ExerciseDetail";
 import Profile from "./pages/Profile";
+import ProfilEnseignant from "./pages/ProfilEnseignant";
 import About from "./pages/About";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -53,6 +54,7 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route path="/profil-ens/:id" element={<ProfilEnseignant />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
