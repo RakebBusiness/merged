@@ -31,7 +31,7 @@ router.get('/teacher/:teacherId', async (req, res) => {
         // Total exercises for teacher's courses
         const exercisesQuery = `
             SELECT COUNT(*) as total
-            FROM "EXERCICE" e
+            FROM "EXERCISE" e
             JOIN "COURS" c ON c."idCours" = e."idCours"
             WHERE c."idEnseignant" = $1
         `;
