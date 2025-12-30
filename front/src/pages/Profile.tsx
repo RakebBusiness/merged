@@ -157,7 +157,7 @@ export default function Profile() {
           <div className="lg:col-span-2">
             <Dashboard
               completedExercises={statistics.exercisesCompleted}
-              totalExercises={statistics.totalExercisesEnrolled}
+              enrolledExercises={statistics.totalExercisesEnrolled}
             />
           </div>
         </div>
