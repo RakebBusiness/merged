@@ -1,5 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Clock, BookOpen, CheckCircle, Lock } from 'lucide-react';
+import { ArrowLeft, Clock, User, CheckCircle, Lock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { coursesApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -18,6 +18,12 @@ export default function CourseDetail() {
       try {
         setLoading(true);
         const data = await coursesApi.getById(Number(id));
+        console.log('📚 Course data:', data);
+        console.log('👨‍🏫 Teacher info:', {
+          idEnseignant: data.idEnseignant,
+          prenomEnseignant: data.prenomEnseignant,
+          nomEnseignant: data.nomEnseignant
+        });
         setCourse(data);
       } catch (err: any) {
         setError(err.message);
@@ -109,16 +115,29 @@ export default function CourseDetail() {
             </div>
             <h1 className="text-4xl font-bold mb-4">{course.titre}</h1>
             <p className="text-xl text-blue-100">{course.description}</p>
-            <div className="flex items-center space-x-2 mt-4 bg-white rounded-lg px-2 py-2 max-w-40">
-              <BookOpen className="w-5 h-5 text-blue-200" />
-              <span className="text-blue-200 text-sm">Enseignant :</span>
-              <span
-                onClick={() => navigate(`/profil-ens/${course.idEnseignant}`)}
-                className="text-white font-semibold cursor-pointer hover:underline hover:text-blue-100 transition"
-              >
-                {course.prenomEnseignant} {course.nomEnseignant}
-              </span>
-            </div>
+            
+            {/* Affichage conditionnel avec débogage */}
+            {course.prenomEnseignant && course.nomEnseignant ? (
+              <div className="flex items-center space-x-2 mt-4 bg-white/10 rounded-lg px-3 py-2 max-w-fit">
+                <User className="w-5 h-5 text-white/80" />
+                <span className="text-white/80 text-sm">Enseignant :</span>
+                <span
+                  onClick={() => {
+                    console.log('🔗 Navigating to teacher profile:', course.idEnseignant);
+                    navigate(`/profil-ens/${course.idEnseignant}`);
+                  }}
+                  className="text-white font-semibold cursor-pointer hover:underline hover:text-white/90 transition"
+                >
+                  {course.prenomEnseignant} {course.nomEnseignant}
+                </span>
+              </div>
+            ) : (
+              <div className="mt-4 p-3 bg-yellow-500/20 rounded-lg">
+                <p className="text-sm text-yellow-100">
+                  ⚠️ Données enseignant manquantes - Vérifier la console pour plus de détails
+                </p>
+              </div>
+            )}
           </div>
 
           {course.topics && course.topics.length > 0 && (

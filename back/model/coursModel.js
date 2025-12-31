@@ -8,7 +8,17 @@ const coursModel = {
     },
 
     async findById(id, userId = null) {
-        const courseQuery = 'SELECT * FROM "COURS" WHERE "idCours" = $1';
+        // ✅ CORRECTION : Ajout du JOIN pour récupérer les infos de l'enseignant
+        const courseQuery = `
+            SELECT 
+                c.*,
+                u."Nom" AS "nomEnseignant",
+                u."Prenom" AS "prenomEnseignant",
+                u."Email" AS "emailEnseignant"
+            FROM "COURS" c
+            LEFT JOIN "USER" u ON c."idEnseignant" = u."idUser"
+            WHERE c."idCours" = $1
+        `;
         const courseResult = await pool.query(courseQuery, [id]);
 
         if (courseResult.rows.length === 0) {
@@ -74,46 +84,57 @@ const coursModel = {
         try {
             await client.query('BEGIN');
 
-            const courseQuery = `SELECT c.*,e."nom" AS "nomEnseignant",e."prenom" AS "prenomEnseignant",e."email" AS "emailEnseignant"
-                                    FROM "COURS" c
-                                    JOIN "ENSEIGNANT" e ON c."idEnseignant" = e."idEnseignant"
-                                    WHERE c."idCours" = $1
-                                `;
-            const courseResult = await client.query(courseQuery, [
-                titre, niveau, description, duree, idEnseignant
+            // 1️⃣ INSERT DU COURS (RIEN D'AUTRE)
+            const insertCourseQuery = `
+                INSERT INTO "COURS" ("titre", "niveau", "description", "duree", "idEnseignant")
+                VALUES ($1, $2, $3, $4, $5)
+                RETURNING *
+            `;
+            const courseResult = await client.query(insertCourseQuery, [
+                titre,
+                niveau,
+                description,
+                duree,
+                idEnseignant
             ]);
+
             const course = courseResult.rows[0];
 
+            // 2️⃣ INSERT DES SECTIONS
             if (sections && sections.length > 0) {
                 for (const section of sections) {
-                    const sectionQuery = `
-                        INSERT INTO "COURS_SECTION" ("section", "theorie", "codeExample", "idCours")
+                    await client.query(
+                        `
+                        INSERT INTO "COURS_SECTION"
+                        ("section", "theorie", "codeExample", "idCours")
                         VALUES ($1, $2, $3, $4)
-                    `;
-                    await client.query(sectionQuery, [
-                        section.section,
-                        section.theorie,
-                        section.codeExample || null,
-                        course.idCours
-                    ]);
+                        `,
+                        [
+                            section.section,
+                            section.theorie,
+                            section.codeExample || null,
+                            course.idCours
+                        ]
+                    );
                 }
             }
 
+            // 3️⃣ INSERT DES TOPICS
             if (topics && topics.length > 0) {
                 for (const topic of topics) {
-                    const topicQuery = `
+                    await client.query(
+                        `
                         INSERT INTO "TOPIC" ("nom", "idCours")
                         VALUES ($1, $2)
-                    `;
-                    await client.query(topicQuery, [
-                        topic.nom,
-                        course.idCours
-                    ]);
+                        `,
+                        [topic.nom, course.idCours]
+                    );
                 }
             }
 
             await client.query('COMMIT');
             return course;
+
         } catch (err) {
             await client.query('ROLLBACK');
             throw err;
