@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ScrollToTop from "../src/components/Scroll/ScrollToTop"; // Importez ScrollToTop
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -23,6 +24,9 @@ function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Ajoutez ScrollToTop ici */}
+      <ScrollToTop />
+      
       {!hideLayout && <Header />}
 
       <main className="flex-1">
