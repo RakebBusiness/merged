@@ -101,6 +101,17 @@ export const coursesApi = {
     if (!response.ok) throw new Error('Failed to update progress');
     return response.json();
   },
+
+  updateConcentration: async (id: number, focusTime: number, totalTime: number) => {
+    const response = await fetch(`${API_BASE_URL}/courses/${id}/concentration`, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+      body: JSON.stringify({ focusTime, totalTime }),
+    });
+    if (!response.ok) throw new Error('Failed to update concentration time');
+    return response.json();
+  },
 };
 
 export const exercisesApi = {

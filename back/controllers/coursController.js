@@ -214,6 +214,34 @@ const coursController = {
             console.error('Error updating progress:', err);
             res.status(500).json({ error: err.message });
         }
+    },
+
+    async updateConcentrationTime(req, res) {
+        try {
+            const { id } = req.params;
+            const { focusTime, totalTime } = req.body;
+            const userId = req.userId;
+            const role = req.role;
+
+            if (!role || (role !== 'etudiant' && role !== 'enseignant')) {
+                return res.status(403).json({ error: 'Only students and teachers can update concentration time' });
+            }
+
+            if (typeof focusTime !== 'number' || focusTime < 0) {
+                return res.status(400).json({ error: 'Focus time must be a positive number' });
+            }
+
+            const isEnrolled = await coursModel.isEnrolled(userId, id);
+            if (!isEnrolled) {
+                return res.status(400).json({ error: 'Not enrolled in this course' });
+            }
+
+            const result = await coursModel.updateConcentrationTime(userId, id, focusTime, totalTime);
+            res.json({ message: 'Concentration time updated successfully', data: result });
+        } catch (err) {
+            console.error('Error updating concentration time:', err);
+            res.status(500).json({ error: err.message });
+        }
     }
 };
 

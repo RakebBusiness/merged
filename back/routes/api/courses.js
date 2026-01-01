@@ -13,5 +13,6 @@ router.delete('/:id', verifyJWT, coursController.deleteCourse);
 router.post('/:id/enroll', verifyJWT, coursController.enrollCourse);
 router.post('/:id/finish', verifyJWT, coursController.finishCourse);
 router.patch('/:id/progress', verifyJWT, coursController.updateProgress);
+router.patch('/:id/concentration', verifyJWT, coursController.updateConcentrationTime);
 
 module.exports = router;

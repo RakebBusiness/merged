@@ -3,6 +3,7 @@ import { ArrowLeft, Clock, User, CheckCircle, Lock } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { coursesApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import FocusTracker from '../components/FocusTracker';
 
 export default function CourseDetail() {
   const { id } = useParams();
@@ -60,6 +61,14 @@ export default function CourseDetail() {
       setCourse(data);
     } catch (err: any) {
       setError(err.message);
+    }
+  };
+
+  const handleFocusUpdate = async (focusTime: number, totalTime: number) => {
+    try {
+      await coursesApi.updateConcentration(Number(id), focusTime, totalTime);
+    } catch (err: any) {
+      console.error('Failed to update concentration time:', err);
     }
   };
 
@@ -246,6 +255,12 @@ export default function CourseDetail() {
               >
                 Login
               </Link>
+            </div>
+          )}
+
+          {course.isEnrolled && (
+            <div className="px-8 py-6">
+              <FocusTracker courseId={Number(id)} onFocusUpdate={handleFocusUpdate} />
             </div>
           )}
 

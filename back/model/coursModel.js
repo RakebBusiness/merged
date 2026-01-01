@@ -254,6 +254,17 @@ const coursModel = {
         `;
         const result = await pool.query(query, [idUser]);
         return result.rows;
+    },
+
+    async updateConcentrationTime(idUser, idCours, focusTime, totalTime) {
+        const query = `
+            UPDATE "ETUDIANT_COURS"
+            SET "tempsConcentration" = $3, "tempsDebut" = 0, "tempsFin" = $4
+            WHERE "idUser" = $1 AND "idCours" = $2
+            RETURNING *
+        `;
+        const result = await pool.query(query, [idUser, idCours, focusTime, totalTime || focusTime]);
+        return result.rows[0];
     }
 };
 
