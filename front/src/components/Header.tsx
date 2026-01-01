@@ -7,9 +7,11 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, isTeacher, logout } = useAuth();
+  const { isAuthenticated, isTeacher, user, logout } = useAuth();
 
   const isActive = (path:String) => location.pathname === path;
+
+  const profilePath = isTeacher && user ? `/profil-ens/${user.idUser}` : '/profile';
 
   const handleLogout = () => {
     logout();
@@ -75,9 +77,9 @@ export default function Header() {
                   </Link>
                 )}
                 <Link
-                  to="/profile"
+                  to={profilePath}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all border border-gray-300 ${
-                    isActive("/profile")
+                    isActive(profilePath)
                       ? "bg-green-600 text-white"
                       : "bg-white hover:bg-green-600 hover:text-white"
                   }`}
@@ -145,10 +147,10 @@ export default function Header() {
                   </Link>
                 )}
                 <Link
-                  to="/profile"
+                  to={profilePath}
                   onClick={() => setIsMenuOpen(false)}
                   className={`block text-center px-4 py-3 rounded-lg font-semibold border ${
-                    isActive("/profile")
+                    isActive(profilePath)
                       ? "bg-green-600 text-white"
                       : "bg-white border-gray-300 hover:bg-green-600 hover:text-white"
                   }`}
