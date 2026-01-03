@@ -4,12 +4,11 @@ import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detec
 import { Eye, EyeOff, Camera, CameraOff } from 'lucide-react';
 
 interface FocusTrackerProps {
-  courseId: number;
   onFocusUpdate?: (focusTime: number, totalTime: number) => void;
   autoStart?: boolean;
 }
 
-export default function FocusTracker({ courseId, onFocusUpdate, autoStart = false }: FocusTrackerProps) {
+export default function FocusTracker({ onFocusUpdate, autoStart = false }: FocusTrackerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isTracking, setIsTracking] = useState(false);
@@ -22,6 +21,7 @@ export default function FocusTracker({ courseId, onFocusUpdate, autoStart = fals
   const detectorRef = useRef<faceLandmarksDetection.FaceLandmarksDetector | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const lastCheckTimeRef = useRef<number>(Date.now());
+  const lastFocusCheckRef = useRef<number>(Date.now());
   const focusTimeRef = useRef<number>(0);
   const totalTimeRef = useRef<number>(0);
 
@@ -61,6 +61,11 @@ export default function FocusTracker({ courseId, onFocusUpdate, autoStart = fals
   const startTracking = async () => {
     try {
       setCameraError('');
+      
+      // Initialize TensorFlow.js backend first
+      await tf.setBackend('webgl');
+      await tf.ready();
+      
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { width: 640, height: 480 }
       });
@@ -70,21 +75,24 @@ export default function FocusTracker({ courseId, onFocusUpdate, autoStart = fals
         videoRef.current.play();
       }
 
-      await tf.ready();
+      // Use TFjs runtime instead of MediaPipe for better reliability
       const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
-      const detectorConfig: faceLandmarksDetection.MediaPipeFaceMeshMediaPipeModelConfig = {
-        runtime: 'mediapipe',
-        solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
+      const detectorConfig: faceLandmarksDetection.MediaPipeFaceMeshTfjsModelConfig = {
+        runtime: 'tfjs',
+        maxFaces: 1,
         refineLandmarks: false,
       };
 
       detectorRef.current = await faceLandmarksDetection.createDetector(model, detectorConfig);
-      setIsTracking(true);
       lastCheckTimeRef.current = Date.now();
+      lastFocusCheckRef.current = Date.now();
+      setIsTracking(true);
+      
+      // Start detection loop after detector is ready
       detectFocus();
     } catch (error) {
       console.error('Error starting focus tracker:', error);
-      setCameraError('Unable to access camera. Please allow camera permissions.');
+      setCameraError('Unable to access camera or initialize face detection. Please allow camera permissions.');
     }
   };
 
@@ -108,7 +116,8 @@ export default function FocusTracker({ courseId, onFocusUpdate, autoStart = fals
   };
 
   const detectFocus = async () => {
-    if (!isTracking || !detectorRef.current || !videoRef.current) return;
+    // Don't check isTracking state here - check refs instead
+    if (!detectorRef.current || !videoRef.current) return;
 
     try {
       const faces = await detectorRef.current.estimateFaces(videoRef.current, {
@@ -143,8 +152,14 @@ export default function FocusTracker({ courseId, onFocusUpdate, autoStart = fals
       setIsFocused(isLookingAtScreen);
 
       if (isLookingAtScreen) {
-        focusTimeRef.current += 0.1;
+        const currentTime = Date.now();
+        const elapsedSinceFocusCheck = (currentTime - lastFocusCheckRef.current) / 1000;
+        focusTimeRef.current += elapsedSinceFocusCheck;
         setFocusTime(Math.floor(focusTimeRef.current));
+        lastFocusCheckRef.current = currentTime;
+      } else {
+        // Update lastFocusCheckRef even when not focused to keep time accurate
+        lastFocusCheckRef.current = Date.now();
       }
 
       if (canvasRef.current && videoRef.current) {
