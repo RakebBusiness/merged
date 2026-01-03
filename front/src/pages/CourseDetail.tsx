@@ -260,7 +260,7 @@ export default function CourseDetail() {
 
           {course.isEnrolled && (
             <div className="px-8 py-6">
-              <FocusTracker courseId={Number(id)} onFocusUpdate={handleFocusUpdate} />
+              <FocusTracker onFocusUpdate={handleFocusUpdate} />
             </div>
           )}
 
