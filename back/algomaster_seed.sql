@@ -540,36 +540,6 @@ INSERT INTO "ETUDIANT_EXERCICE" ("idUser", "idExercice", "completed", "score", "
 (6, 12, FALSE, 0, NULL),
 (6, 13, FALSE, 0, NULL);
 
--- ============================
--- POPULATE ACHIEVEMENTS
--- ============================
-INSERT INTO "STUDENT_ACHIEVEMENT" ("idUser", "idAchievement", "unlockedAt") VALUES
--- Benzo achievements
-(4, 1, NOW() - INTERVAL '28 days'), -- First Steps
-(4, 2, NOW() - INTERVAL '60 days'), -- Course Explorer
-(4, 3, NOW() - INTERVAL '24 days'), -- Quick Learner
-(4, 5, NOW() - INTERVAL '30 days'), -- Course Master
-
--- Lamass achievements
-(5, 1, NOW() - INTERVAL '18 days'),
-(5, 2, TRUE, 65, NOW() - INTERVAL '17 days'),
-(5, 3, FALSE, 0, NULL),
-(5, 15, TRUE, 88, NOW() - INTERVAL '15 days'),
-(5, 16, TRUE, 92, NOW() - INTERVAL '14 days'),
-
--- Islem (student 6) - most advanced, completed many exercises
-(6, 1, TRUE, 100, NOW() - INTERVAL '58 days'),
-(6, 2, TRUE, 95, NOW() - INTERVAL '57 days'),
-(6, 3, TRUE, 100, NOW() - INTERVAL '56 days'),
-(6, 4, TRUE, 100, NOW() - INTERVAL '55 days'),
-(6, 5, TRUE, 95, NOW() - INTERVAL '54 days'),
-(6, 6, TRUE, 90, NOW() - INTERVAL '45 days'),
-(6, 7, TRUE, 88, NOW() - INTERVAL '44 days'),
-(6, 8, TRUE, 92, NOW() - INTERVAL '43 days'),
-(6, 9, TRUE, 85, NOW() - INTERVAL '18 days'),
-(6, 10, TRUE, 90, NOW() - INTERVAL '17 days'),
-(6, 11, TRUE, 95, NOW() - INTERVAL '16 days');
-
 
 -- ============================
 -- POPULATE ACHIEVEMENTS
