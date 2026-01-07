@@ -1,8 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, Code, FileText, ListChecks, User } from 'lucide-react';
 import Quiz from '../components/Exercise/quiz';
-import CodeEditor from '../components/Exercise/MonacoEditor/MonacoEditor';
 import AICorrectionPanel, { type CorrectionResult } from '../components/Exercise/AICorrectionPanel';
 import { exercisesApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
@@ -17,7 +16,6 @@ export default function ExerciseDetail() {
   const [code, setCode] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
   const [correction, setCorrection] = useState<CorrectionResult | null>(null);
-  const correctionPanelRef = useRef<any>(null);
 
   useEffect(() => {
     const fetchExercise = async () => {
@@ -48,20 +46,6 @@ export default function ExerciseDetail() {
 
   const handleCompleteExercise = () => {
     setIsCompleted(true);
-  };
-
-  const handleCodeSubmit = async () => {
-    if (!exercise || !code) return;
-
-    const hasCode = code.trim().length > 0;
-
-    if (hasCode) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      handleCompleteExercise();
-      alert('Code submitted successfully! (Demo mode - no actual validation)');
-    } else {
-      alert('Please write some code before submitting.');
-    }
   };
 
   const handleAICorrection = async (solution: string) => {
@@ -207,77 +191,23 @@ export default function ExerciseDetail() {
               <Quiz exercise={exercise} onComplete={handleCompleteExercise} />
             )}
 
-            {exercise.Type === 'Text Answer' && (
-              <>
-                <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Question</h2>
-                  <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-                    {exercise.enonce}
-                  </p>
-                </div>
-
-                <AICorrectionPanel
-                  ref={correctionPanelRef}
-                  exerciseType="Text Answer"
-                  question={exercise.enonce}
-                  onSubmit={handleAICorrection}
-                />
-              </>
-            )}
-
-            {exercise.Type === 'Code' && (
+            {(exercise.Type === 'Text Answer' || exercise.Type === 'Code') && (
               <div>
                 <div className="mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Problem Statement</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                    {exercise.Type === 'Code' ? 'Problem Statement' : 'Question'}
+                  </h2>
                   <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
                     {exercise.enonce}
                   </p>
                 </div>
 
-                <div className="mb-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Code Editor</h3>
-                  <CodeEditor
-                    value={code}
-                    onChange={setCode}
-                    language="javascript"
-                    height="400px"
-                  />
-                </div>
-
-                <div className="flex gap-4">
-                  <button
-                    onClick={handleCodeSubmit}
-                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors shadow-md hover:shadow-lg"
-                  >
-                    Submit Code
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      try {
-                        console.log('Code to execute:', code);
-                        alert('Code executed in console (development mode)');
-                      } catch (err) {
-                        alert('Error in code');
-                      }
-                    }}
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors shadow-md hover:shadow-lg"
-                  >
-                    Run Code
-                  </button>
-                </div>
-
-                <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    💡 Demo mode: Real code validation is not yet implemented.
-                  </p>
-                </div>
-
-                <div className="mt-8">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">AI Code Review</h3>
+                <div className={exercise.Type === 'Code' ? 'mt-8' : ''}>
+                  {exercise.Type === 'Code' && (
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">AI Code Review</h3>
+                  )}
                   <AICorrectionPanel
-                    ref={correctionPanelRef}
-                    exerciseType="Code"
+                    exerciseType={exercise.Type}
                     question={exercise.enonce}
                     onSubmit={handleAICorrection}
                   />
