@@ -1,5 +1,6 @@
 const exerciceModel = require('../model/exerciceModel');
 const etudiantModel = require('../model/etudiantModel');
+const llmService = require('../services/llmService');
 
 // Transformation des données de l'exercice pour le front
 const transformExerciseData = (exercise) => {
@@ -228,6 +229,77 @@ const exerciceController = {
             res.json(transformedExercises);
         } catch (err) {
             console.error('Error fetching enrolled exercises:', err);
+            res.status(500).json({ error: err.message });
+        }
+    },
+
+    async correctExercise(req, res) {
+        try {
+            const { id } = req.params;
+            const { solution } = req.body;
+            const userId = req.userId;
+
+            if (!solution || solution.trim().length === 0) {
+                return res.status(400).json({ error: 'Solution is required' });
+            }
+
+            const exercise = await exerciceModel.findById(id);
+            if (!exercise) {
+                return res.status(404).json({ error: 'Exercise not found' });
+            }
+
+            if (exercise.type !== 'quiz' && exercise.type !== 'code') {
+                return res.status(400).json({
+                    error: 'AI correction is only available for text answers and code exercises'
+                });
+            }
+
+            const isHealthy = await llmService.healthCheck();
+            if (!isHealthy) {
+                return res.status(503).json({
+                    error: 'AI correction service is currently unavailable. Please try again later.'
+                });
+            }
+
+            const correction = await llmService.correctExercise(
+                exercise.statement,
+                solution,
+                exercise.type
+            );
+
+            const correctionRecord = await exerciceModel.saveCorrection({
+                idExercice: id,
+                idUser: userId,
+                studentSolution: solution,
+                evaluation: correction.evaluation,
+                score: correction.score,
+                perfectSolution: correction.perfectSolution
+            });
+
+            res.json({
+                success: true,
+                correction: {
+                    evaluation: correction.evaluation,
+                    score: correction.score,
+                    perfectSolution: correction.perfectSolution,
+                    correctionId: correctionRecord.id
+                }
+            });
+        } catch (err) {
+            console.error('Error correcting exercise:', err);
+            res.status(500).json({ error: err.message });
+        }
+    },
+
+    async getCorrectionHistory(req, res) {
+        try {
+            const { id } = req.params;
+            const userId = req.userId;
+
+            const corrections = await exerciceModel.getCorrectionHistory(userId, id);
+            res.json(corrections);
+        } catch (err) {
+            console.error('Error fetching correction history:', err);
             res.status(500).json({ error: err.message });
         }
     }

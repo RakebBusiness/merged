@@ -11,5 +11,7 @@ router.post('/', verifyJWT, exerciceController.createExercise);
 router.put('/:id', verifyJWT, exerciceController.updateExercise);
 router.delete('/:id', verifyJWT, exerciceController.deleteExercise);
 router.post('/:id/enroll', verifyJWT, exerciceController.enrollExercise);
+router.post('/:id/correct', verifyJWT, exerciceController.correctExercise);
+router.get('/:id/corrections', verifyJWT, exerciceController.getCorrectionHistory);
 
 module.exports = router;

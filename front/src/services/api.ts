@@ -186,6 +186,29 @@ export const exercisesApi = {
     if (!response.ok) throw new Error('Failed to enroll in exercise');
     return response.json();
   },
+
+  correct: async (id: number, solution: string) => {
+    const response = await fetch(`${API_BASE_URL}/exercises/${id}/correct`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      credentials: 'include',
+      body: JSON.stringify({ solution }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to get AI correction');
+    }
+    return response.json();
+  },
+
+  getCorrectionHistory: async (id: number) => {
+    const response = await fetch(`${API_BASE_URL}/exercises/${id}/corrections`, {
+      headers: getAuthHeaders(),
+      credentials: 'include',
+    });
+    if (!response.ok) throw new Error('Failed to fetch correction history');
+    return response.json();
+  },
 };
 
 export const profileApi = {

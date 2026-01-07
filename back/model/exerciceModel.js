@@ -228,6 +228,39 @@ const exerciceModel = {
         }
 
         return exercises;
+    },
+
+    async saveCorrection(correctionData) {
+        const { idExercice, idUser, studentSolution, evaluation, score, perfectSolution } = correctionData;
+
+        const query = `
+            INSERT INTO "EXERCISE_CORRECTION"
+            ("idExercice", "idUser", "studentSolution", "evaluation", "score", "perfectSolution", "correctedAt")
+            VALUES ($1, $2, $3, $4, $5, $6, NOW())
+            RETURNING *
+        `;
+
+        const result = await pool.query(query, [
+            idExercice,
+            idUser,
+            studentSolution,
+            evaluation,
+            score,
+            perfectSolution
+        ]);
+
+        return result.rows[0];
+    },
+
+    async getCorrectionHistory(idUser, idExercice) {
+        const query = `
+            SELECT * FROM "EXERCISE_CORRECTION"
+            WHERE "idUser" = $1 AND "idExercice" = $2
+            ORDER BY "correctedAt" DESC
+        `;
+
+        const result = await pool.query(query, [idUser, idExercice]);
+        return result.rows;
     }
 };
 

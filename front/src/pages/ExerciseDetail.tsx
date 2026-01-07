@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, Code, FileText, ListChecks, User } from 'lucide-react';
 import Quiz from '../components/Exercise/quiz';
 import CodeEditor from '../components/Exercise/MonacoEditor/MonacoEditor';
+import AICorrectionPanel, { type CorrectionResult } from '../components/Exercise/AICorrectionPanel';
 import { exercisesApi } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -15,6 +16,8 @@ export default function ExerciseDetail() {
   const [error, setError] = useState('');
   const [code, setCode] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
+  const [correction, setCorrection] = useState<CorrectionResult | null>(null);
+  const correctionPanelRef = useRef<any>(null);
 
   useEffect(() => {
     const fetchExercise = async () => {
@@ -58,6 +61,26 @@ export default function ExerciseDetail() {
       alert('Code submitted successfully! (Demo mode - no actual validation)');
     } else {
       alert('Please write some code before submitting.');
+    }
+  };
+
+  const handleAICorrection = async (solution: string) => {
+    if (!exercise) return;
+
+    try {
+      const result = await exercisesApi.correct(Number(id), solution);
+
+      if (result.success && result.correction) {
+        setCorrection(result.correction);
+
+        if (result.correction.score !== null && result.correction.score >= 70) {
+          handleCompleteExercise();
+        }
+      }
+
+      return result;
+    } catch (err: any) {
+      throw new Error(err.message || 'Failed to get AI correction');
     }
   };
 
@@ -180,8 +203,26 @@ export default function ExerciseDetail() {
 
           {/* Exercise Content */}
           <div className="px-8 py-6">
-            {(exercise.Type === 'Multiple choice' || exercise.Type === 'Text Answer') && (
+            {exercise.Type === 'Multiple choice' && (
               <Quiz exercise={exercise} onComplete={handleCompleteExercise} />
+            )}
+
+            {exercise.Type === 'Text Answer' && (
+              <>
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">Question</h2>
+                  <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                    {exercise.enonce}
+                  </p>
+                </div>
+
+                <AICorrectionPanel
+                  ref={correctionPanelRef}
+                  exerciseType="Text Answer"
+                  question={exercise.enonce}
+                  onSubmit={handleAICorrection}
+                />
+              </>
             )}
 
             {exercise.Type === 'Code' && (
@@ -230,6 +271,16 @@ export default function ExerciseDetail() {
                   <p className="text-sm text-blue-800">
                     💡 Demo mode: Real code validation is not yet implemented.
                   </p>
+                </div>
+
+                <div className="mt-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">AI Code Review</h3>
+                  <AICorrectionPanel
+                    ref={correctionPanelRef}
+                    exerciseType="Code"
+                    question={exercise.enonce}
+                    onSubmit={handleAICorrection}
+                  />
                 </div>
               </div>
             )}
