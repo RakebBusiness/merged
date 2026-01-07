@@ -234,9 +234,9 @@ VALUES
     ('Dedicated Student', 'Complete 10 exercises', '🌟', 200),
     ('Course Master', 'Complete your first course', '🏆', 150),
     ('Algorithm Expert', 'Complete 20 exercises', '💎', 500),
-    ('Consistency King', 'Complete 3 courses', '👑', 300)
+    ('Consistency King', 'Complete 3 courses', '👑', 300),
 
-
+);
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_student_achievement_user ON "STUDENT_ACHIEVEMENT"("idUser");
 CREATE INDEX IF NOT EXISTS idx_etudiant_level ON "ETUDIANT"("level");
