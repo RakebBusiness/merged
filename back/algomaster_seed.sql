@@ -569,8 +569,7 @@ INSERT INTO "STUDENT_ACHIEVEMENT" ("idUser", "idAchievement", "unlockedAt") VALU
 (6, 9, TRUE, 85, NOW() - INTERVAL '18 days'),
 (6, 10, TRUE, 90, NOW() - INTERVAL '17 days'),
 (6, 11, TRUE, 95, NOW() - INTERVAL '16 days'),
-(6, 12, FALSE, 0, NULL),
-(6, 13, FALSE, 0, NULL);
+
 
 -- ============================
 -- POPULATE ACHIEVEMENTS
