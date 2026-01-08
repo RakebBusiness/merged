@@ -1,8 +1,49 @@
 import { BookOpen, Users, Award, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import StatsSection from "../components/StatsSection";
+import { useState, useEffect } from "react";
+
+interface Feedback {
+  id: string;
+  name: string;
+  email: string | null;
+  message: string;
+  rating: number | null;
+  created_at: string;
+}
 
 export default function Home() {
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
+
+  useEffect(() => {
+    const fetchFeedback = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/feedback/approved');
+        if (response.ok) {
+          const data = await response.json();
+          setFeedback(data.slice(0, 3));
+        }
+      } catch (err) {
+        console.error('Failed to fetch feedback:', err);
+      }
+    };
+
+    fetchFeedback();
+  }, []);
+
+  const renderStars = (rating: number | null) => {
+    if (!rating) return null;
+    return (
+      <div className="flex gap-1">
+        {[...Array(5)].map((_, i) => (
+          <span key={i} className={i < rating ? 'text-yellow-500' : 'text-gray-300'}>
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div>
       {/* HERO SECTION */}
@@ -106,6 +147,39 @@ export default function Home() {
         </div>
       </section>
 
+      {/* FEEDBACK SECTION */}
+      {feedback.length > 0 && (
+        <section className="py-20 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-14">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+                Ce que disent nos étudiants
+              </h2>
+              <p className="text-lg text-gray-600 mt-4">
+                Découvrez les témoignages de ceux qui ont appris avec AlgoMaster
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {feedback.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="font-semibold text-lg text-gray-900">{item.name}</h3>
+                    </div>
+                    {renderStars(item.rating)}
+                  </div>
+                  <p className="text-gray-600 leading-relaxed">{item.message}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* CTA FINAL */}
       <section className="py-20 bg-gradient-to-br from-blue-900 to-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
@@ -113,7 +187,7 @@ export default function Home() {
             Prêt à maîtriser l'algorithmique ?
           </h2>
           <p className="text-lg text-blue-100 mb-8">
-            Rejoignez des milliers d’étudiants qui réussissent grâce à
+            Rejoignez des milliers d'étudiants qui réussissent grâce à
             AlgoMaster.
           </p>
           <Link

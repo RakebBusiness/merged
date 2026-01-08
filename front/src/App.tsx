@@ -15,6 +15,7 @@ import About from "./pages/About";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PanelEns from "./pages/ens-panel/PanelEns";
+import AdminPanel from "./pages/AdminPanel";
 
 function AppContent() {
   const location = useLocation();
@@ -67,6 +68,14 @@ function AppContent() {
             element={
               <ProtectedRoute requireTeacher>
                 <PanelEns />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-panel"
+            element={
+              <ProtectedRoute requireAuth>
+                <AdminPanel />
               </ProtectedRoute>
             }
           />

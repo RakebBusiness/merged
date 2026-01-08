@@ -5,17 +5,38 @@ export default function About() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    message: ''
+    message: '',
+    rating: 5
   });
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({ name: '', email: '', message: '' });
-    }, 3000);
+    setError('');
+
+    try {
+      const response = await fetch('http://localhost:5000/feedback/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          setFormData({ name: '', email: '', message: '', rating: 5 });
+        }, 3000);
+      } else {
+        setError('Failed to submit feedback. Please try again.');
+      }
+    } catch (err) {
+      setError('Failed to submit feedback. Please try again.');
+      console.error(err);
+    }
   };
 
   return (
@@ -187,10 +208,35 @@ export default function About() {
               />
             </div>
 
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Rating</label>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, rating: star })}
+                    className="text-3xl transition-colors"
+                  >
+                    <span className={star <= formData.rating ? 'text-yellow-500' : 'text-gray-300'}>
+                      ★
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {error && (
+              <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-lg flex items-center space-x-2">
+                <span className="text-xl">✗</span>
+                <span className="font-medium">{error}</span>
+              </div>
+            )}
+
             {submitted && (
               <div className="mb-6 p-4 bg-green-50 text-green-800 rounded-lg flex items-center space-x-2">
                 <span className="text-xl">✓</span>
-                <span className="font-medium">Thank you! Your message has been sent.</span>
+                <span className="font-medium">Thank you! Your feedback has been submitted and is awaiting approval.</span>
               </div>
             )}
 

@@ -44,6 +44,7 @@ app.use('/exercises', require('./routes/api/exercises'));
 app.use('/statistics', require('./routes/api/statistics'));
 app.use('/teachers', require('./routes/api/teachers'));
 app.use('/profile', require('./routes/profile'));
+app.use('/feedback', require('./routes/api/feedback'));
 
 app.all('*', (req, res) => {
     res.status(404);
