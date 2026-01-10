@@ -1,6 +1,7 @@
 const userModel = require('../model/userModel');
 const etudiantModel = require('../model/etudiantModel');
 const enseignantModel = require('../model/enseignantModel');
+const enseignantAttenteModel = require('../model/enseignantAttenteModel');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -16,6 +17,14 @@ const handleLogin = async (req, res) => {
         const foundUser = await userModel.findByEmail(email);
         if (!foundUser) {
             return res.status(401).json({ 'error': 'Invalid credentials.' });
+        }
+
+        // 🔥 Bloquer la connexion si enseignant en attente
+        const enseignantEnAttente = await enseignantAttenteModel.findById(foundUser.idUser);
+        if (enseignantEnAttente) {
+            return res.status(403).json({
+                error: "Votre inscription est en attente de validation par l'administrateur."
+            });
         }
 
         const match = await bcryptjs.compare(motDePasse, foundUser.motDePasse);

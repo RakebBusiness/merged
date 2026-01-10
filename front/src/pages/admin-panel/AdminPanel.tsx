@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import FeedBackPanel from './FeedBackPanel';
+import EnseignantPanel from './EnseignantPanel';
 
 export default function AdminPanel() {
-  const [activeTab, setActiveTab] = useState<'feedback' | 'other'>('feedback');
+  const [activeTab, setActiveTab] = useState<'feedback' | 'enseignant'>('feedback');
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -20,9 +21,9 @@ export default function AdminPanel() {
               Feedback Management
             </button>
             <button
-              onClick={() => setActiveTab('other')}
+              onClick={() => setActiveTab('enseignant')}
               className={`px-6 py-4 font-semibold transition ${
-                activeTab === 'other'
+                activeTab === 'enseignant'
                   ? 'border-b-4 border-blue-600 text-blue-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
@@ -35,12 +36,7 @@ export default function AdminPanel() {
 
       <div className="py-8">
         {activeTab === 'feedback' && <FeedBackPanel />}
-        {activeTab === 'other' && (
-          <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-4">Teacher Management</h2>
-            <p className="text-gray-600">Content for other admin section coming soon...</p>
-          </div>
-        )}
+        {activeTab === 'enseignant' && <EnseignantPanel />}
       </div>
     </div>
   );

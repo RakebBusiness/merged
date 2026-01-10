@@ -1,6 +1,7 @@
 const userModel = require('../model/userModel');
 const etudiantModel = require('../model/etudiantModel');
 const enseignantModel = require('../model/enseignantModel');
+const enseignantAttenteModel = require('../model/enseignantAttenteModel');
 const bcryptjs = require('bcryptjs');
 
 const handleNewUser = async (req, res) => {
@@ -43,10 +44,17 @@ const handleNewUser = async (req, res) => {
                 annee: parseInt(annee)
             });
         } else if (userType === 'enseignant') {
-            await enseignantModel.create({
+            console.log("Enseignant détecté, insertion dans ENSEIGNANT_ATTENTE...");
+            const enseignantAttente = await enseignantAttenteModel.create({
                 idUser: nextId,
                 specialite,
                 grade
+            });
+            console.log("Résultat insertion enseignant attente:", enseignantAttente);
+        } else {
+            res.status(201).json({
+                success: true,
+                message: `Nouvel utilisateur ${prenom} ${nom} créé!`
             });
         }
 

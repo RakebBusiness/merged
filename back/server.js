@@ -45,6 +45,7 @@ app.use('/statistics', require('./routes/api/statistics'));
 app.use('/teachers', require('./routes/api/teachers'));
 app.use('/profile', require('./routes/profile'));
 app.use('/feedback', require('./routes/api/feedback'));
+app.use('/enseignant', require('./routes/api/enseignant')); // NOUVELLE ROUTE AJOUTÉE
 
 app.all('*', (req, res) => {
     res.status(404);

@@ -72,8 +72,13 @@ const Signup = () => {
       });
       const data = await response.json();
       if (data.success) {
+        if (formData.userType === 'enseignant') {
+        alert("Votre inscription est en attente"); // "Votre inscription est en attente..."
+        navigate("/login"); // Tu peux toujours rediriger vers login
+    } else {
         alert("🎉 Inscription réussie !");
         navigate("/login");
+    }
       } else alert(data.error);
     } catch {
       alert("Erreur de connexion au serveur");
