@@ -127,10 +127,20 @@ CREATE TABLE IF NOT EXISTS "CODE_TEST" (
 -- TABLE FEEDBACK
 -- ============================
 CREATE TABLE IF NOT EXISTS "FEEDBACK" (
-    "idFeedback" SERIAL PRIMARY KEY,
-    "Avis" VARCHAR(255),
-    "idUser" INT,
-    FOREIGN KEY ("idUser") REFERENCES "USER"("idUser") ON DELETE CASCADE
+  "idFeedback" SERIAL PRIMARY KEY,
+  "name" text NOT NULL,
+  "email" text,
+  "message" text NOT NULL,
+  "rating" integer CHECK ("rating" >= 1 AND "rating" <= 5),
+  "created_at" timestamptz DEFAULT now()
+);
+CREATE TABLE IF NOT EXISTS "FEEDBACK_ATTENTE" (
+  "idFeedback" SERIAL PRIMARY KEY,
+  "name" text NOT NULL,
+  "email" text,
+  "message" text NOT NULL,
+  "rating" integer CHECK ("rating" >= 1 AND "rating" <= 5),
+  "created_at" timestamptz DEFAULT now()
 );
 
 -- ============================
@@ -235,7 +245,8 @@ VALUES
     ('Course Master', 'Complete your first course', '🏆', 150),
     ('Algorithm Expert', 'Complete 20 exercises', '💎', 500),
     ('Consistency King', 'Complete 3 courses', '👑', 300)
-);
+
+
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_student_achievement_user ON "STUDENT_ACHIEVEMENT"("idUser");
 CREATE INDEX IF NOT EXISTS idx_etudiant_level ON "ETUDIANT"("level");

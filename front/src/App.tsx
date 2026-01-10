@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
-import ScrollToTop from "../src/components/Scroll/ScrollToTop"; // Importez ScrollToTop
+import ScrollToTop from "./components/Scroll/ScrollToTop"; // Corrigé le chemin
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -15,21 +15,25 @@ import About from "./pages/About";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import PanelEns from "./pages/ens-panel/PanelEns";
-import AdminPanel from "./pages/AdminPanel";
+import AdminPanel from "./pages/admin-panel/AdminPanel";
 
 function AppContent() {
   const location = useLocation();
 
-  const noLayoutRoutes = ["/login", "/signup", "/Panelens"];
-  const hideLayout = noLayoutRoutes.includes(location.pathname);
+  // Routes sans layout (Header/Footer)
+  const noLayoutRoutes = ["/login", "/signup", "/panelens", "/adminpanel"];
+  const pathname = location.pathname.toLowerCase();
+  const hideLayout = noLayoutRoutes.includes(pathname);
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Ajoutez ScrollToTop ici */}
+      {/* ScrollToTop */}
       <ScrollToTop />
-      
+
+      {/* Header */}
       {!hideLayout && <Header />}
 
+      {/* Main content */}
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -64,24 +68,18 @@ function AppContent() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route
-            path="/Panelens"
+            path="/panelens"
             element={
               <ProtectedRoute requireTeacher>
                 <PanelEns />
               </ProtectedRoute>
             }
           />
-          <Route
-            path="/admin-panel"
-            element={
-              <ProtectedRoute requireAuth>
-                <AdminPanel />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/adminpanel" element={<AdminPanel />} />
         </Routes>
       </main>
 
+      {/* Footer */}
       {!hideLayout && <Footer />}
     </div>
   );

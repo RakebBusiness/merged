@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
 
 interface Feedback {
-  id: string;
+  idFeedback: number; // correspond à ta colonne
   name: string;
   email: string | null;
   message: string;
@@ -11,21 +10,17 @@ interface Feedback {
 }
 
 export default function FeedBackPanel() {
-  const { auth } = useAuth();
   const [approvedFeedback, setApprovedFeedback] = useState<Feedback[]>([]);
   const [pendingFeedback, setPendingFeedback] = useState<Feedback[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  // Récupérer tous les feedbacks
   const fetchFeedback = async () => {
     try {
       const [approvedRes, pendingRes] = await Promise.all([
         fetch('http://localhost:5000/feedback/approved'),
-        fetch('http://localhost:5000/feedback/pending', {
-          headers: {
-            'Authorization': `Bearer ${auth?.accessToken}`,
-          },
-        }),
+        fetch('http://localhost:5000/feedback/pending'), // plus besoin d'auth
       ]);
 
       if (approvedRes.ok) {
@@ -49,13 +44,11 @@ export default function FeedBackPanel() {
     fetchFeedback();
   }, []);
 
-  const handleApprove = async (id: string) => {
+  // Approve feedback
+  const handleApprove = async (id: number) => {
     try {
       const response = await fetch(`http://localhost:5000/feedback/approve/${id}`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${auth?.accessToken}`,
-        },
       });
 
       if (response.ok) {
@@ -69,13 +62,11 @@ export default function FeedBackPanel() {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  // Delete feedback
+  const handleDelete = async (id: number) => {
     try {
       const response = await fetch(`http://localhost:5000/feedback/pending/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${auth?.accessToken}`,
-        },
       });
 
       if (response.ok) {
@@ -124,6 +115,7 @@ export default function FeedBackPanel() {
         </div>
       )}
 
+      {/* Pending Feedback */}
       <div className="mb-12">
         <h2 className="text-2xl font-semibold mb-4 text-orange-600">
           Pending Feedback ({pendingFeedback.length})
@@ -133,7 +125,10 @@ export default function FeedBackPanel() {
         ) : (
           <div className="grid gap-4">
             {pendingFeedback.map((feedback) => (
-              <div key={feedback.id} className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 shadow">
+              <div
+                key={feedback.idFeedback}
+                className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 shadow"
+              >
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="font-semibold text-lg">{feedback.name}</h3>
@@ -150,13 +145,13 @@ export default function FeedBackPanel() {
                   </span>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleApprove(feedback.id)}
+                      onClick={() => handleApprove(feedback.idFeedback)}
                       className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
                     >
                       Approve
                     </button>
                     <button
-                      onClick={() => handleDelete(feedback.id)}
+                      onClick={() => handleDelete(feedback.idFeedback)}
                       className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition"
                     >
                       Delete
@@ -169,6 +164,7 @@ export default function FeedBackPanel() {
         )}
       </div>
 
+      {/* Approved Feedback */}
       <div>
         <h2 className="text-2xl font-semibold mb-4 text-green-600">
           Approved Feedback ({approvedFeedback.length})
@@ -178,7 +174,10 @@ export default function FeedBackPanel() {
         ) : (
           <div className="grid gap-4">
             {approvedFeedback.map((feedback) => (
-              <div key={feedback.id} className="bg-white border border-gray-200 rounded-lg p-6 shadow">
+              <div
+                key={feedback.idFeedback}
+                className="bg-white border border-gray-200 rounded-lg p-6 shadow"
+              >
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="font-semibold text-lg">{feedback.name}</h3>

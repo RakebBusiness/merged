@@ -153,7 +153,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-14">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                Ce que disent nos étudiants
+                Ce que disent nos utilisateurs
               </h2>
               <p className="text-lg text-gray-600 mt-4">
                 Découvrez les témoignages de ceux qui ont appris avec AlgoMaster

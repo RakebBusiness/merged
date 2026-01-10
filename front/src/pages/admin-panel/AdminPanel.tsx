@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import FeedBackPanel from './admin-panel/FeedBackPanel';
+import FeedBackPanel from './FeedBackPanel';
 
 export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<'feedback' | 'other'>('feedback');
@@ -27,7 +27,7 @@ export default function AdminPanel() {
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Other Section
+              Teacher Management
             </button>
           </div>
         </div>
@@ -37,7 +37,7 @@ export default function AdminPanel() {
         {activeTab === 'feedback' && <FeedBackPanel />}
         {activeTab === 'other' && (
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold mb-4">Other Section</h2>
+            <h2 className="text-2xl font-bold mb-4">Teacher Management</h2>
             <p className="text-gray-600">Content for other admin section coming soon...</p>
           </div>
         )}
