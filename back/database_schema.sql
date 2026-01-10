@@ -34,6 +34,12 @@ CREATE TABLE IF NOT EXISTS "ENSEIGNANT" (
     "Grade" VARCHAR(100),
     FOREIGN KEY ("idUser") REFERENCES "USER"("idUser") ON DELETE CASCADE
 );
+CREATE TABLE IF NOT EXISTS "ENSEIGNANT_ATTENTE" (
+    "idUser" INT PRIMARY KEY,
+    "Specialite" VARCHAR(150),
+    "Grade" VARCHAR(100),
+    FOREIGN KEY ("idUser") REFERENCES "USER"("idUser") ON DELETE CASCADE
+);
 
 -- ============================
 -- TABLE COURS
