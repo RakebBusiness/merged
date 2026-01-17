@@ -19,12 +19,6 @@ export default function CourseDetail() {
       try {
         setLoading(true);
         const data = await coursesApi.getById(Number(id));
-        console.log('📚 Course data:', data);
-        console.log('👨‍🏫 Teacher info:', {
-          idEnseignant: data.idEnseignant,
-          prenomEnseignant: data.prenomEnseignant,
-          nomEnseignant: data.nomEnseignant
-        });
         setCourse(data);
       } catch (err: any) {
         setError(err.message);
@@ -132,7 +126,6 @@ export default function CourseDetail() {
                 <span className="text-white/80 text-sm">Enseignant :</span>
                 <span
                   onClick={() => {
-                    console.log('🔗 Navigating to teacher profile:', course.idEnseignant);
                     navigate(`/profil-ens/${course.idEnseignant}`);
                   }}
                   className="text-white font-semibold cursor-pointer hover:underline hover:text-white/90 transition"

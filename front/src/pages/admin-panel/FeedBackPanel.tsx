@@ -62,7 +62,7 @@ export default function FeedBackPanel() {
     }
   };
 
-  // Delete feedback
+  // Delete pending feedback
   const handleDelete = async (id: number) => {
     try {
       const response = await fetch(`http://localhost:5000/feedback/pending/${id}`, {
@@ -76,6 +76,28 @@ export default function FeedBackPanel() {
       }
     } catch (err) {
       setError('Failed to delete feedback');
+      console.error(err);
+    }
+  };
+
+  // Delete approved feedback
+  const handleDeleteApproved = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this approved feedback?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/feedback/approved/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        fetchFeedback();
+      } else {
+        setError('Failed to delete approved feedback');
+      }
+    } catch (err) {
+      setError('Failed to delete approved feedback');
       console.error(err);
     }
   };
@@ -188,9 +210,17 @@ export default function FeedBackPanel() {
                   {renderStars(feedback.rating)}
                 </div>
                 <p className="text-gray-700 mb-3">{feedback.message}</p>
-                <span className="text-sm text-gray-500">
-                  {formatDate(feedback.created_at)}
-                </span>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">
+                    {formatDate(feedback.created_at)}
+                  </span>
+                  <button
+                    onClick={() => handleDeleteApproved(feedback.idFeedback)}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             ))}
           </div>

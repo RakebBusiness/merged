@@ -1,10 +1,12 @@
+
 import { useState } from 'react';
-import { Sparkles, CheckCircle, XCircle, Loader2, AlertCircle, Eye, EyeOff, FileText } from 'lucide-react';
+import { Sparkles, CheckCircle, XCircle, Loader2, AlertCircle, Eye, EyeOff, FileText, BookOpen } from 'lucide-react';
 import MonacoEditor from './MonacoEditor/MonacoEditor';
 
-interface AICorrectionPanelProps {
+interface ExerciseCorrectionPanelProps {
   exerciseType: 'Text Answer' | 'Code';
   question: string;
+  teacherSolution?: string;
   onSubmit: (solution: string) => Promise<any>;
 }
 
@@ -14,12 +16,13 @@ interface CorrectionResult {
   perfectSolution: string;
 }
 
-export default function AICorrectionPanel({ exerciseType, question, onSubmit }: AICorrectionPanelProps) {
+export default function ExerciseCorrectionPanel({ exerciseType, teacherSolution, onSubmit }: ExerciseCorrectionPanelProps) {
   const [solution, setSolution] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [correction, setCorrection] = useState<CorrectionResult | null>(null);
   const [error, setError] = useState('');
   const [showPerfectSolution, setShowPerfectSolution] = useState(false);
+  const [showTeacherSolution, setShowTeacherSolution] = useState(false);
 
   const handleSubmit = async () => {
     if (!solution.trim()) {
@@ -97,6 +100,45 @@ export default function AICorrectionPanel({ exerciseType, question, onSubmit }: 
           </div>
         )}
       </div>
+
+      {teacherSolution && (
+        <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <button
+            onClick={() => setShowTeacherSolution(!showTeacherSolution)}
+            className="w-full px-6 py-4 bg-gradient-to-r from-blue-50 to-indigo-50 hover:from-blue-100 hover:to-indigo-100 transition-colors flex items-center justify-between border-b border-gray-200"
+          >
+            <div className="flex items-center space-x-2">
+              <BookOpen className="w-5 h-5 text-blue-600" />
+              <span className="font-semibold text-gray-900">Teacher's Solution</span>
+            </div>
+            {showTeacherSolution ? (
+              <EyeOff className="w-5 h-5 text-gray-600" />
+            ) : (
+              <Eye className="w-5 h-5 text-gray-600" />
+            )}
+          </button>
+
+          {showTeacherSolution && (
+            <div className="p-6 bg-white">
+              {exerciseType === 'Code' ? (
+                <div className="border border-gray-300 rounded-lg overflow-hidden">
+                  <MonacoEditor
+                    value={teacherSolution}
+                    onChange={() => {}}
+                    language="javascript"
+                    height="300px"
+                    readOnly
+                  />
+                </div>
+              ) : (
+                <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800 leading-relaxed bg-gray-50 p-4 rounded-lg">
+                  {teacherSolution}
+                </pre>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <button
         onClick={handleSubmit}

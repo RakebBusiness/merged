@@ -2,6 +2,7 @@ const userModel = require('../model/userModel');
 const etudiantModel = require('../model/etudiantModel');
 const enseignantModel = require('../model/enseignantModel');
 const enseignantAttenteModel = require('../model/enseignantAttenteModel');
+const adminModel = require('../model/adminModel');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -35,15 +36,24 @@ const handleLogin = async (req, res) => {
         let userDetails = { ...foundUser };
         let role = 'user';
 
-        const etudiant = await etudiantModel.findById(foundUser.idUser);
-        if (etudiant) {
-            userDetails = etudiant;
-            role = 'etudiant';
+        // Check for admin first (highest priority)
+        const admin = await adminModel.findById(foundUser.idUser);
+        if (admin) {
+            userDetails = admin;
+            role = 'admin';
         } else {
-            const enseignant = await enseignantModel.findById(foundUser.idUser);
-            if (enseignant) {
-                userDetails = enseignant;
-                role = 'enseignant';
+            // Check for etudiant
+            const etudiant = await etudiantModel.findById(foundUser.idUser);
+            if (etudiant) {
+                userDetails = etudiant;
+                role = 'etudiant';
+            } else {
+                // Check for enseignant
+                const enseignant = await enseignantModel.findById(foundUser.idUser);
+                if (enseignant) {
+                    userDetails = enseignant;
+                    role = 'enseignant';
+                }
             }
         }
 

@@ -24,7 +24,7 @@ function AppContent() {
   const noLayoutRoutes = ["/login", "/signup", "/panelens", "/adminpanel"];
   const pathname = location.pathname.toLowerCase();
   const hideLayout = noLayoutRoutes.includes(pathname);
-
+  
   return (
     <div className="min-h-screen flex flex-col">
       {/* ScrollToTop */}
@@ -75,7 +75,14 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
-          <Route path="/adminpanel" element={<AdminPanel />} />
+          <Route
+            path="/adminpanel" 
+            element={
+              <ProtectedRoute requireAdmin>
+                  <AdminPanel/>
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
       </main>
 

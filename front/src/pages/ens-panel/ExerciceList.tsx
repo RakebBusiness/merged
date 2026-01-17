@@ -32,7 +32,7 @@ function ExerciseList() {
       const formatted = (data || []).map((ex: any) => {
         let type: 'qcm' | 'quiz' | 'code' = 'qcm';
         if (ex.Type === 'Multiple choice') type = 'qcm';
-        else if (ex.Type === 'Quiz') type = 'quiz';
+        else if (ex.Type === 'Text Answer') type = 'quiz';
         else if (ex.Type === 'Code') type = 'code';
 
         const base = {
@@ -62,7 +62,7 @@ function ExerciseList() {
         if (type === 'code') {
           return {
             ...base,
-            tests: ex.tests || []
+            answer: ex.correctAnswer || ''
           };
         }
 

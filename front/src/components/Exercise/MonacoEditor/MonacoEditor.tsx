@@ -11,6 +11,7 @@ interface CodeEditorProps {
   language: string;
   height?: string;
   theme?: string;
+  readOnly?: boolean;
 }
 
 const CodeEditor: React.FC<CodeEditorProps> = ({
@@ -18,7 +19,8 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   onChange,
   language = 'javascript',
   height = '400px',
-  theme = 'vs-dark'
+  theme = 'vs-dark',
+  readOnly = false
 }) => {
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoEl = useRef<HTMLDivElement>(null);
@@ -37,6 +39,7 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
         wordWrap: 'on',
         lineNumbers: 'on',
         roundedSelection: false,
+        readOnly,
         scrollbar: {
           vertical: 'visible',
           horizontal: 'visible',

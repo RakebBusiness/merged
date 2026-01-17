@@ -6,13 +6,6 @@ export interface QcmOption {
   option_text: string;
 }
 
-export interface CodeTest {
-  id?: number;
-  exercise_id?: number;
-  input: string;
-  expected_output: string;
-}
-
 export interface BaseExercise {
   id: number;
   title: string;
@@ -35,7 +28,7 @@ export interface QuizExercise extends BaseExercise {
 
 export interface CodeExercise extends BaseExercise {
   type: 'code';
-  tests: CodeTest[];
+  answer: string;
 }
 
 export type Exercise = QcmExercise | QuizExercise | CodeExercise;
@@ -48,5 +41,4 @@ export interface ExerciseFormData {
   options?: string[];
   correctOptionIndex?: number;
   answer?: string;
-  tests?: CodeTest[];
 }

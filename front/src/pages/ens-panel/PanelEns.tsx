@@ -1,17 +1,27 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   BarChart3,
   BookOpen,
   Edit2,
+  LogOut,
 } from "lucide-react";
 import CourseList from "./CourseList.tsx";
 import ExerciseList from "./ExerciceList.tsx";
 import Statistics from "./Statistics.tsx";
+import { useAuth } from "../../context/AuthContext.tsx";
 
-function AdminPanel() {
+function EnsPanel() {
   const [activeTab, setActiveTab] = useState<
     "dashboard" | "courses" | "exercises"
   >("dashboard");
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -29,14 +39,24 @@ function AdminPanel() {
                 <p className="text-sm text-gray-600">Algorithmique</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">Prof. gr</p>
-                <p className="text-xs text-gray-500">Enseignant</p>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="text-right">
+                  <p className="text-sm font-medium text-gray-900">Prof. gr</p>
+                  <p className="text-xs text-gray-500">Enseignant</p>
+                </div>
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 font-semibold">MD</span>
+                </div>
               </div>
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-semibold">MD</span>
-              </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                title="Logout"
+              >
+                <LogOut className="w-4 h-4" />
+                <span className="font-medium hidden sm:inline">Logout</span>
+              </button>
             </div>
           </div>
         </div>
@@ -97,4 +117,4 @@ function AdminPanel() {
   );
 }
 
-export default AdminPanel;
+export default EnsPanel;

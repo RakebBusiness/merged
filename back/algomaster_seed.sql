@@ -414,75 +414,70 @@ INSERT INTO "QCM_OPTION" ("exerciseId", "optionText") VALUES
 INSERT INTO "QCM_ANSWER" ("exerciseId", "correctOptionIndex") VALUES (16, 0);
 
 -- ============================
--- POPULATE QUIZ ANSWERS
+-- POPULATE EXERCISE ANSWERS (for quiz and code exercises)
 -- ============================
-INSERT INTO "QUIZ_ANSWER" ("exerciseId", "answer") VALUES
+INSERT INTO "EXERCISE_ANSWER" ("exerciseId", "answer") VALUES
+-- Quiz exercises
 (2, 'O(n log n) signifie que le temps d''exécution croît proportionnellement à n multiplié par le logarithme de n, typique des algorithmes de tri efficaces comme le tri fusion.'),
 (7, 'Une collision se produit quand deux clés différentes produisent le même hash. On peut la résoudre par chaînage (listes chaînées) ou adressage ouvert (probing).'),
 (10, 'Dijkstra fonctionne uniquement avec des poids positifs et est généralement plus rapide, tandis que Bellman-Ford peut gérer des poids négatifs mais est plus lent (O(VE) vs O(V log V + E)).'),
-(13, 'Un problème possède une sous-structure optimale si sa solution optimale peut être construite à partir des solutions optimales de ses sous-problèmes.');
-
--- ============================
--- POPULATE CODE TESTS
--- ============================
-
--- Exercise 3: Recherche linéaire
-INSERT INTO "CODE_TEST" ("exerciseId", "input", "expectedOutput") VALUES
-(3, '[1, 2, 3, 4, 5]
-3', '2'),
-(3, '[10, 20, 30, 40]
-50', '-1'),
-(3, '[5]
-5', '0');
-
--- Exercise 4: Tri par sélection
-INSERT INTO "CODE_TEST" ("exerciseId", "input", "expectedOutput") VALUES
-(4, '[64, 25, 12, 22, 11]', '[11, 12, 22, 25, 64]'),
-(4, '[5, 2, 8, 1, 9]', '[1, 2, 5, 8, 9]'),
-(4, '[1]', '[1]');
-
--- Exercise 6: Insertion dans ABR
-INSERT INTO "CODE_TEST" ("exerciseId", "input", "expectedOutput") VALUES
-(6, 'None
-5', '5'),
-(6, '5
-3', '5 3'),
-(6, '5 3 7
-4', '5 3 4 7');
-
--- Exercise 9: BFS
-INSERT INTO "CODE_TEST" ("exerciseId", "input", "expectedOutput") VALUES
-(9, '{"A": ["B", "C"], "B": ["D"], "C": ["E"], "D": [], "E": []}
-A', '["A", "B", "C", "D", "E"]'),
-(9, '{"1": ["2", "3"], "2": ["4"], "3": [], "4": []}
-1', '["1", "2", "3", "4"]');
-
--- Exercise 12: Fibonacci mémoïsation
-INSERT INTO "CODE_TEST" ("exerciseId", "input", "expectedOutput") VALUES
-(12, '5', '5'),
-(12, '10', '55'),
-(12, '0', '0');
-
--- Exercise 14: Sac à dos
-INSERT INTO "CODE_TEST" ("exerciseId", "input", "expectedOutput") VALUES
-(14, '[1, 2, 3]
-[10, 15, 40]
-6', '55'),
-(14, '[2, 3, 4]
-[3, 4, 5]
-5', '7');
-
--- Exercise 15: Tri fusion
-INSERT INTO "CODE_TEST" ("exerciseId", "input", "expectedOutput") VALUES
-(15, '[38, 27, 43, 3, 9, 82, 10]', '[3, 9, 10, 27, 38, 43, 82]'),
-(15, '[5, 2, 8, 1, 9]', '[1, 2, 5, 8, 9]');
-
--- Exercise 16: Recherche binaire
-INSERT INTO "CODE_TEST" ("exerciseId", "input", "expectedOutput") VALUES
-(16, '[1, 2, 3, 4, 5, 6, 7, 8, 9]
-5', '4'),
-(16, '[1, 3, 5, 7, 9]
-6', '-1');
+(13, 'Un problème possède une sous-structure optimale si sa solution optimale peut être construite à partir des solutions optimales de ses sous-problèmes.'),
+-- Code exercises (single expected answer instead of multiple test cases)
+(3, 'def recherche_lineaire(liste, element):
+    for i in range(len(liste)):
+        if liste[i] == element:
+            return i
+    return -1'),
+(4, 'def tri_selection(liste):
+    n = len(liste)
+    for i in range(n):
+        min_idx = i
+        for j in range(i+1, n):
+            if liste[j] < liste[min_idx]:
+                min_idx = j
+        liste[i], liste[min_idx] = liste[min_idx], liste[i]
+    return liste'),
+(6, 'def inserer_abr(racine, valeur):
+    if racine is None:
+        return Noeud(valeur)
+    if valeur < racine.valeur:
+        racine.gauche = inserer_abr(racine.gauche, valeur)
+    else:
+        racine.droite = inserer_abr(racine.droite, valeur)
+    return racine'),
+(9, 'def bfs(graphe, depart):
+    visite = []
+    file = [depart]
+    while file:
+        noeud = file.pop(0)
+        if noeud not in visite:
+            visite.append(noeud)
+            file.extend(graphe.get(noeud, []))
+    return visite'),
+(12, 'def fibonacci_memo(n, memo={}):
+    if n in memo:
+        return memo[n]
+    if n <= 1:
+        return n
+    memo[n] = fibonacci_memo(n-1, memo) + fibonacci_memo(n-2, memo)
+    return memo[n]'),
+(14, 'def sac_a_dos(poids, valeurs, capacite):
+    n = len(poids)
+    dp = [[0]*(capacite+1) for _ in range(n+1)]
+    for i in range(1, n+1):
+        for w in range(capacite+1):
+            if poids[i-1] <= w:
+                dp[i][w] = max(dp[i-1][w], valeurs[i-1] + dp[i-1][w-poids[i-1]])
+            else:
+                dp[i][w] = dp[i-1][w]
+    return dp[n][capacite]'),
+(15, 'def tri_fusion(liste):
+    if len(liste) <= 1:
+        return liste
+    milieu = len(liste) // 2
+    gauche = tri_fusion(liste[:milieu])
+    droite = tri_fusion(liste[milieu:])
+    return fusion(gauche, droite)');
 
 -- ============================
 -- POPULATE STUDENT ENROLLMENTS
@@ -565,25 +560,6 @@ INSERT INTO "STUDENT_ACHIEVEMENT" ("idUser", "idAchievement", "unlockedAt") VALU
 (6, 6, NOW() - INTERVAL '16 days'), -- Algorithm Expert
 (6, 7, NOW() - INTERVAL '20 days'); -- Consistency King
 
--- ============================
--- POPULATE FEEDBACK
--- ============================
-INSERT INTO "FEEDBACK" ("Avis", "idUser") VALUES
-('Excellente plateforme! Les exercices sont bien structurés et progressifs.', 4),
-('Les explications sont claires, mais j''aimerais plus d''exemples pratiques.', 5),
-('Interface intuitive et contenu de qualité. Merci aux enseignants!', 6),
-('Le cours sur les graphes est fantastique, très bien expliqué.', 6),
-('Bon contenu mais quelques bugs dans l''interface de code.', 4);
-
--- ============================
--- LINK USERS TO FEEDBACK
--- ============================
-INSERT INTO "USER_FEEDBACK" ("idUser", "idFeedback") VALUES
-(4, 1),
-(4, 5),
-(5, 2),
-(6, 3),
-(6, 4);
 
 -- ============================
 -- VERIFICATION QUERIES

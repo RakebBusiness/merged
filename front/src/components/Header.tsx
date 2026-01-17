@@ -7,12 +7,11 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, isTeacher, user, logout } = useAuth();
+  const { isAuthenticated, isTeacher, isAdmin, user, logout } = useAuth();
 
   const isActive = (path:String) => location.pathname === path;
 
   const profilePath = isTeacher && user ? `/profil-ens/${user.idUser}` : '/profile';
-
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -76,6 +75,19 @@ export default function Header() {
                     Teacher Panel
                   </Link>
                 )}
+                {isAdmin && (
+                  <Link
+                    to="/Adminpanel"
+                    className={`px-4 py-2 rounded-lg font-semibold transition-all border border-gray-300 ${
+                      isActive("/AdminPanel")
+                        ? "bg-blue-600 text-white"
+                        : "bg-white hover:bg-blue-600 hover:text-white"
+                    }`}
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+                {!isAdmin && (
                 <Link
                   to={profilePath}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all border border-gray-300 ${
@@ -86,6 +98,7 @@ export default function Header() {
                 >
                   Mon Profil
                 </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="px-4 py-2 rounded-lg font-semibold transition-all border border-gray-300 bg-white hover:bg-red-600 hover:text-white flex items-center space-x-2"

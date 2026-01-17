@@ -24,10 +24,8 @@ const transformExerciseData = (exercise) => {
         transformed.options = exercise.options.map(opt => opt.optionText);
         transformed.correctAnswer = exercise.options[exercise.correctOptionIndex]?.optionText;
         transformed.correctOptionIndex = exercise.correctOptionIndex;
-    } else if (exercise.type === 'quiz') {
+    } else if (exercise.type === 'quiz' || exercise.type === 'code') {
         transformed.correctAnswer = exercise.answer;
-    } else if (exercise.type === 'code') {
-        transformed.tests = exercise.tests;
     }
 
     return transformed;
@@ -76,7 +74,7 @@ const exerciceController = {
 
     async createExercise(req, res) {
         try {
-            const { title, type, statement, idCours, options, correctOptionIndex, answer, tests } = req.body;
+            const { title, type, statement, idCours, options, correctOptionIndex, answer } = req.body;
             const userId = req.userId;
             const role = req.role;
 
@@ -96,8 +94,8 @@ const exerciceController = {
                 return res.status(400).json({ error: 'Quiz exercises must have an answer' });
             }
 
-            if (type === 'code' && (!tests || tests.length === 0)) {
-                return res.status(400).json({ error: 'Code exercises must have test cases' });
+            if (type === 'code' && !answer) {
+                return res.status(400).json({ error: 'Code exercises must have an expected answer' });
             }
 
             const newExercise = await exerciceModel.create({
@@ -108,8 +106,7 @@ const exerciceController = {
                 idCours,
                 options,
                 correctOptionIndex,
-                answer,
-                tests
+                answer
             });
 
             res.status(201).json(newExercise);
@@ -122,7 +119,7 @@ const exerciceController = {
     async updateExercise(req, res) {
         try {
             const { id } = req.params;
-            const { title, type, statement, idCours, options, correctOptionIndex, answer, tests } = req.body;
+            const { title, type, statement, idCours, options, correctOptionIndex, answer } = req.body;
             const userId = req.userId;
             const role = req.role;
 
@@ -143,8 +140,8 @@ const exerciceController = {
                 return res.status(400).json({ error: 'Quiz exercises must have an answer' });
             }
 
-            if (type === 'code' && (!tests || tests.length === 0)) {
-                return res.status(400).json({ error: 'Code exercises must have test cases' });
+            if (type === 'code' && !answer) {
+                return res.status(400).json({ error: 'Code exercises must have an expected answer' });
             }
 
             const updatedExercise = await exerciceModel.update(id, {
@@ -154,8 +151,7 @@ const exerciceController = {
                 idCours,
                 options,
                 correctOptionIndex,
-                answer,
-                tests
+                answer
             });
 
             res.json(updatedExercise);

@@ -38,14 +38,10 @@ const exerciceModel = {
             const answerQuery = 'SELECT "correctOptionIndex" FROM "QCM_ANSWER" WHERE "exerciseId" = $1';
             const answerResult = await pool.query(answerQuery, [id]);
             exercise.correctOptionIndex = answerResult.rows[0]?.correctOptionIndex;
-        } else if (exercise.type === 'quiz') {
-            const answerQuery = 'SELECT "answer" FROM "QUIZ_ANSWER" WHERE "exerciseId" = $1';
+        } else if (exercise.type === 'quiz' || exercise.type === 'code') {
+            const answerQuery = 'SELECT "answer" FROM "EXERCISE_ANSWER" WHERE "exerciseId" = $1';
             const answerResult = await pool.query(answerQuery, [id]);
             exercise.answer = answerResult.rows[0]?.answer;
-        } else if (exercise.type === 'code') {
-            const testsQuery = 'SELECT * FROM "CODE_TEST" WHERE "exerciseId" = $1 ORDER BY "id"';
-            const testsResult = await pool.query(testsQuery, [id]);
-            exercise.tests = testsResult.rows;
         }
 
         return exercise;
@@ -95,24 +91,12 @@ const exerciceModel = {
                         [newExercise.id, correctOptionIndex]
                     );
                 }
-            } else if (type === 'quiz') {
+            } else if (type === 'quiz' || type === 'code') {
                 if (answer) {
                     await client.query(
-                        'INSERT INTO "QUIZ_ANSWER" ("exerciseId", "answer") VALUES ($1, $2)',
+                        'INSERT INTO "EXERCISE_ANSWER" ("exerciseId", "answer") VALUES ($1, $2)',
                         [newExercise.id, answer]
                     );
-                }
-            } else if (type === 'code') {
-                if (tests && tests.length > 0) {
-                    for (const test of tests) {
-                        if (test.input == null || test.expected_output == null) {
-                            throw new Error('Chaque test doit avoir un input et un expectedOutput');
-                        }
-                        await client.query(
-                            'INSERT INTO "CODE_TEST" ("exerciseId", "input", "expectedOutput") VALUES ($1, $2, $3)',
-                            [newExercise.id, test.input, test.expected_output]
-                        );
-                    }
                 }
             }
 
@@ -143,8 +127,7 @@ const exerciceModel = {
 
             await client.query('DELETE FROM "QCM_OPTION" WHERE "exerciseId" = $1', [id]);
             await client.query('DELETE FROM "QCM_ANSWER" WHERE "exerciseId" = $1', [id]);
-            await client.query('DELETE FROM "QUIZ_ANSWER" WHERE "exerciseId" = $1', [id]);
-            await client.query('DELETE FROM "CODE_TEST" WHERE "exerciseId" = $1', [id]);
+            await client.query('DELETE FROM "EXERCISE_ANSWER" WHERE "exerciseId" = $1', [id]);
 
             if (type === 'qcm') {
                 if (options && options.length > 0) {
@@ -162,21 +145,12 @@ const exerciceModel = {
                         [id, correctOptionIndex]
                     );
                 }
-            } else if (type === 'quiz') {
+            } else if (type === 'quiz' || type === 'code') {
                 if (answer) {
                     await client.query(
-                        'INSERT INTO "QUIZ_ANSWER" ("exerciseId", "answer") VALUES ($1, $2)',
+                        'INSERT INTO "EXERCISE_ANSWER" ("exerciseId", "answer") VALUES ($1, $2)',
                         [id, answer]
                     );
-                }
-            } else if (type === 'code') {
-                if (tests && tests.length > 0) {
-                    for (const test of tests) {
-                        await client.query(
-                            'INSERT INTO "CODE_TEST" ("exerciseId", "input", "expectedOutput") VALUES ($1, $2, $3)',
-                            [id, test.input, test.expected_output]
-                        );
-                    }
                 }
             }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
-import { Exercise, ExerciseType, CodeTest } from '../../../types/exercise';
+import { Exercise, ExerciseType } from '../../../types/exercise';
 
 interface ExerciseModalProps {
   show: boolean;
@@ -21,7 +21,6 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
   const [options, setOptions] = useState<string[]>(['', '', '', '']);
   const [correctOptionIndex, setCorrectOptionIndex] = useState(0);
   const [answer, setAnswer] = useState('');
-  const [tests, setTests] = useState<CodeTest[]>([{ input: '', expected_output: '' }]);
 
   useEffect(() => {
     if (editingExercise) {
@@ -32,10 +31,8 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
       if (editingExercise.type === 'qcm') {
         setOptions(editingExercise.options.map(opt => opt.option_text));
         setCorrectOptionIndex(editingExercise.correctOptionIndex || 0);
-      } else if (editingExercise.type === 'quiz') {
+      } else if (editingExercise.type === 'quiz' || editingExercise.type === 'code') {
         setAnswer(editingExercise.answer);
-      } else if (editingExercise.type === 'code') {
-        setTests(editingExercise.tests.length > 0 ? editingExercise.tests : [{ input: '', expected_output: '' }]);
       }
     } else {
       resetForm();
@@ -49,16 +46,12 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
     setOptions(['', '', '', '']);
     setCorrectOptionIndex(0);
     setAnswer('');
-    setTests([{ input: '', expected_output: '' }]);
   };
 
   const handleTypeChange = (newType: ExerciseType) => {
     setType(newType);
     if (newType === 'qcm' && options.length === 0) {
       setOptions(['', '', '', '']);
-    }
-    if (newType === 'code' && tests.length === 0) {
-      setTests([{ input: '', expected_output: '' }]);
     }
   };
 
@@ -80,20 +73,6 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
     setOptions(newOptions);
   };
 
-  const handleAddTest = () => {
-    setTests([...tests, { input: '', expected_output: '' }]);
-  };
-
-  const handleRemoveTest = (index: number) => {
-    setTests(tests.filter((_, i) => i !== index));
-  };
-
-  const handleTestChange = (index: number, field: 'input' | 'expected_output', value: string) => {
-    const newTests = [...tests];
-    newTests[index][field] = value;
-    setTests(newTests);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -111,15 +90,10 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
         options: options.filter(opt => opt.trim() !== '').map(opt => ({ option_text: opt })),
         correctOptionIndex,
       };
-    } else if (type === 'quiz') {
+    } else if (type === 'quiz' || type === 'code') {
       exerciseData = {
         ...baseData,
         answer,
-      };
-    } else if (type === 'code') {
-      exerciseData = {
-        ...baseData,
-        tests: tests.filter(test => test.input.trim() !== '' && test.expected_output.trim() !== ''),
       };
     }
 
@@ -285,63 +259,20 @@ const ExerciseModal: React.FC<ExerciseModalProps> = ({
 
           {type === 'code' && (
             <div>
-              <div className="flex justify-between items-center mb-3">
-                <label className="block text-sm font-medium text-gray-700">
-                  Tests
-                </label>
-                <button
-                  type="button"
-                  onClick={handleAddTest}
-                  className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
-                >
-                  <Plus size={16} />
-                  Ajouter un test
-                </button>
-              </div>
-              <div className="space-y-4">
-                {tests.map((test, index) => (
-                  <div key={index} className="border border-gray-300 rounded-lg p-4">
-                    <div className="flex justify-between items-center mb-3">
-                      <h4 className="font-medium text-gray-700">Test {index + 1}</h4>
-                      {tests.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTest(index)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      )}
-                    </div>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">
-                          Entrée
-                        </label>
-                        <textarea
-                          value={test.input}
-                          onChange={(e) => handleTestChange(index, 'input', e.target.value)}
-                          rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 mb-1">
-                          Sortie attendue
-                        </label>
-                        <textarea
-                          value={test.expected_output}
-                          onChange={(e) => handleTestChange(index, 'expected_output', e.target.value)}
-                          rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          required
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Réponse attendue (code)
+              </label>
+              <textarea
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                rows={6}
+                placeholder="Entrez la réponse attendue pour cet exercice de code..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Entrez la solution ou le résultat attendu pour cet exercice de code
+              </p>
             </div>
           )}
 

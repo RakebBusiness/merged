@@ -10,5 +10,6 @@ router.post('/submit', feedbackController.submitFeedback);
 // Routes pour gérer les feedbacks (approve / delete) sans auth
 router.post('/approve/:id', feedbackController.approveFeedback);
 router.delete('/pending/:id', feedbackController.deletePending);
+router.delete('/approved/:id', feedbackController.deleteApproved);
 
 module.exports = router;

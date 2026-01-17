@@ -5,7 +5,7 @@ interface User {
   Email: string;
   nom: string;
   prenom: string;
-  role: 'etudiant' | 'enseignant';
+  role: 'etudiant' | 'enseignant' | 'admin';
   [key: string]: any;
 }
 
@@ -15,6 +15,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
+  isAdmin: boolean;
   isTeacher: boolean;
   isStudent: boolean;
 }
@@ -68,10 +69,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     login,
     logout,
     isAuthenticated: !!user && !!accessToken,
+    isAdmin: user?.role === 'admin',
     isTeacher: user?.role === 'enseignant',
     isStudent: user?.role === 'etudiant',
+   
   };
-
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 

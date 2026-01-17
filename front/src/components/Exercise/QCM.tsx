@@ -1,25 +1,25 @@
 import React, { useState } from 'react';
 
-interface QuizProps {
+interface QCMProps {
   exercise: {
     idExercice: string;
     titre: string;
     enonce: string;
     Type: string;
-    options?: string[];
-    correctAnswer?: string;
+    options: string[];
+    correctAnswer: string;
   };
   onComplete: () => void;
 }
 
-const Quiz: React.FC<QuizProps> = ({ exercise, onComplete }) => {
+const QCM: React.FC<QCMProps> = ({ exercise, onComplete }) => {
   const [selectedOption, setSelectedOption] = useState<string>('');
-  const [textAnswer, setTextAnswer] = useState<string>('');
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [isCorrect, setIsCorrect] = useState<boolean>(false);
+  const uniqueOptions = [...new Set(exercise.options)];
 
   const handleSubmit = () => {
-    if (exercise.Type === 'Multiple choice') {
+    
       const correct = selectedOption === exercise.correctAnswer;
       setIsCorrect(correct);
       setSubmitted(true);
@@ -28,18 +28,6 @@ const Quiz: React.FC<QuizProps> = ({ exercise, onComplete }) => {
         setTimeout(() => {
           onComplete();
         }, 1500);
-      }
-    } else if (exercise.Type === 'Text Answer') {
-      // Pour les réponses textuelles, on considère que c'est correct si non vide
-      const correct = textAnswer.trim().length > 0;
-      setIsCorrect(correct);
-      setSubmitted(true);
-      
-      if (correct) {
-        setTimeout(() => {
-          onComplete();
-        }, 1500);
-      }
     }
   };
 
@@ -53,9 +41,8 @@ const Quiz: React.FC<QuizProps> = ({ exercise, onComplete }) => {
         {exercise.enonce}
       </p>
 
-      {exercise.Type === 'Multiple choice' && exercise.options && (
         <div className="space-y-3 mb-6">
-          {exercise.options.map((option, index) => (
+          {uniqueOptions.map((option, index) => (
             <div
               key={index}
               className={`p-4 border rounded-lg cursor-pointer transition-colors ${
@@ -80,18 +67,6 @@ const Quiz: React.FC<QuizProps> = ({ exercise, onComplete }) => {
             </div>
           ))}
         </div>
-      )}
-
-      {exercise.Type === 'Text Answer' && (
-        <div className="mb-6">
-          <textarea
-            value={textAnswer}
-            onChange={(e) => setTextAnswer(e.target.value)}
-            className="w-full h-40 p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="Type your answer here..."
-          />
-        </div>
-      )}
 
       {submitted && (
         <div className={`p-4 rounded-lg mb-6 ${
@@ -105,10 +80,7 @@ const Quiz: React.FC<QuizProps> = ({ exercise, onComplete }) => {
 
       <button
         onClick={handleSubmit}
-        disabled={
-          (exercise.Type === 'Multiple choice' && !selectedOption) ||
-          (exercise.Type === 'Text Answer' && !textAnswer.trim())
-        }
+        disabled={!selectedOption}
         className={`px-6 py-3 rounded-lg font-medium ${
           submitted && isCorrect
             ? 'bg-green-600 hover:bg-green-700'
@@ -121,4 +93,4 @@ const Quiz: React.FC<QuizProps> = ({ exercise, onComplete }) => {
   );
 };
 
-export default Quiz;
+export default QCM;

@@ -97,7 +97,8 @@ CREATE TABLE IF NOT EXISTS "QCM_OPTION" (
     "id" SERIAL PRIMARY KEY,
     "exerciseId" INT NOT NULL,
     "optionText" TEXT NOT NULL,
-    FOREIGN KEY ("exerciseId") REFERENCES "EXERCISE"("id") ON DELETE CASCADE
+    FOREIGN KEY ("exerciseId") REFERENCES "EXERCISE"("id") ON DELETE CASCADE,
+    CONSTRAINT "unique_exercise_option" UNIQUE ("exerciseId", "optionText")
 );
 
 -- ============================
@@ -110,22 +111,11 @@ CREATE TABLE IF NOT EXISTS "QCM_ANSWER" (
 );
 
 -- ============================
--- TABLE QUIZ_ANSWER
+-- TABLE EXERCISE_ANSWER (for quiz and code exercises)
 -- ============================
-CREATE TABLE IF NOT EXISTS "QUIZ_ANSWER" (
+CREATE TABLE IF NOT EXISTS "EXERCISE_ANSWER" (
     "exerciseId" INT PRIMARY KEY,
     "answer" TEXT NOT NULL,
-    FOREIGN KEY ("exerciseId") REFERENCES "EXERCISE"("id") ON DELETE CASCADE
-);
-
--- ============================
--- TABLE CODE_TEST
--- ============================
-CREATE TABLE IF NOT EXISTS "CODE_TEST" (
-    "id" SERIAL PRIMARY KEY,
-    "exerciseId" INT NOT NULL,
-    "input" TEXT NOT NULL,
-    "expectedOutput" TEXT NOT NULL,
     FOREIGN KEY ("exerciseId") REFERENCES "EXERCISE"("id") ON DELETE CASCADE
 );
 
@@ -197,7 +187,6 @@ CREATE INDEX IF NOT EXISTS "idx_exercise_enseignant" ON "EXERCISE"("idEnseignant
 CREATE INDEX IF NOT EXISTS "idx_exercise_cours" ON "EXERCISE"("idCours");
 
 CREATE INDEX IF NOT EXISTS "idx_qcm_option_exercise" ON "QCM_OPTION"("exerciseId");
-CREATE INDEX IF NOT EXISTS "idx_code_test_exercise" ON "CODE_TEST"("exerciseId");
 
 CREATE INDEX IF NOT EXISTS "idx_topic_cours" ON "TOPIC"("idCours");
 CREATE INDEX IF NOT EXISTS "idx_section_cours" ON "COURS_SECTION"("idCours");
@@ -240,6 +229,21 @@ CREATE TABLE IF NOT EXISTS "STUDENT_ACHIEVEMENT" (
     FOREIGN KEY ("idUser") REFERENCES "ETUDIANT"("idUser") ON DELETE CASCADE,
     FOREIGN KEY ("idAchievement") REFERENCES "ACHIEVEMENT"("idAchievement") ON DELETE CASCADE
 );
+-- ============================
+-- TABLE ADMIN
+-- ============================
+CREATE TABLE IF NOT EXISTS "ADMIN" (
+    "idUser" INT PRIMARY KEY,
+    "role" VARCHAR(50) DEFAULT 'admin',
+    "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY ("idUser") REFERENCES "USER"("idUser") ON DELETE CASCADE
+);
+
+-- Create index for performance
+CREATE INDEX IF NOT EXISTS "idx_admin_user" ON "ADMIN"("idUser");
+
+-- Add comment to table
+COMMENT ON TABLE "ADMIN" IS 'Stores admin user information, linked to USER table';
 
 -- Insert default achievements
 INSERT INTO "ACHIEVEMENT" ("name", "description", "icon", "xpReward")

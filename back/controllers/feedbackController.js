@@ -120,6 +120,25 @@ const feedbackController = {
             console.error('Error deleting feedback:', error);
             res.status(500).json({ message: 'Error deleting feedback' });
         }
+    },
+
+    // DELETE approved feedback
+    async deleteApproved(req, res) {
+        try {
+            const result = await pool.query(
+                'DELETE FROM "FEEDBACK" WHERE "idFeedback" = $1 RETURNING *',
+                [req.params.id]
+            );
+
+            if (result.rows.length === 0) {
+                return res.status(404).json({ message: 'Feedback not found' });
+            }
+
+            res.json({ message: 'Approved feedback deleted successfully' });
+        } catch (error) {
+            console.error('Error deleting approved feedback:', error);
+            res.status(500).json({ message: 'Error deleting approved feedback' });
+        }
     }
 };
 
