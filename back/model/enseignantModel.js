@@ -14,7 +14,7 @@ const enseignantModel = {
 
     async findById(idUser) {
         const query = `
-            SELECT u.*, en."Specialite", en."Grade"
+            SELECT u.*, en."Specialite", en."Grade", en."suspended"
             FROM "USER" u
             INNER JOIN "ENSEIGNANT" en ON u."idUser" = en."idUser"
             WHERE u."idUser" = $1
@@ -37,12 +37,34 @@ const enseignantModel = {
 
     async getAll() {
         const query = `
-            SELECT u.*, en."Specialite", en."Grade"
+            SELECT u.*, en."Specialite", en."Grade", en."suspended"
             FROM "USER" u
             INNER JOIN "ENSEIGNANT" en ON u."idUser" = en."idUser"
         `;
         const result = await pool.query(query);
         return result.rows;
+    },
+
+    async suspend(idUser) {
+        const query = `
+            UPDATE "ENSEIGNANT"
+            SET "suspended" = TRUE
+            WHERE "idUser" = $1
+            RETURNING *
+        `;
+        const result = await pool.query(query, [idUser]);
+        return result.rows[0];
+    },
+
+    async reactivate(idUser) {
+        const query = `
+            UPDATE "ENSEIGNANT"
+            SET "suspended" = FALSE
+            WHERE "idUser" = $1
+            RETURNING *
+        `;
+        const result = await pool.query(query, [idUser]);
+        return result.rows[0];
     }
 };
 

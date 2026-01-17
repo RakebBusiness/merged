@@ -11,6 +11,7 @@ interface Enseignant {
   idUser: number;
   Specialite: string | null;
   Grade: string | null;
+  suspended?: boolean;
   user?: User;
 }
 
@@ -81,6 +82,46 @@ export default function EnseignantPanel() {
       }
     } catch (err) {
       setError('Failed to delete enseignant');
+      console.error(err);
+    }
+  };
+
+  // Suspend teacher
+  const handleSuspend = async (id: number) => {
+    if (!window.confirm('Are you sure you want to suspend this teacher? They will not be able to log in.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5000/enseignant/suspend/${id}`, {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        fetchEnseignants();
+      } else {
+        setError('Failed to suspend teacher');
+      }
+    } catch (err) {
+      setError('Failed to suspend teacher');
+      console.error(err);
+    }
+  };
+
+  // Reactivate teacher
+  const handleReactivate = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:5000/enseignant/reactivate/${id}`, {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        fetchEnseignants();
+      } else {
+        setError('Failed to reactivate teacher');
+      }
+    } catch (err) {
+      setError('Failed to reactivate teacher');
       console.error(err);
     }
   };
@@ -169,17 +210,28 @@ export default function EnseignantPanel() {
             {approvedEnseignants.map((enseignant) => (
               <div
                 key={enseignant.idUser}
-                className="bg-white border border-gray-200 rounded-lg p-6 shadow"
+                className={`border rounded-lg p-6 shadow ${
+                  enseignant.suspended
+                    ? 'bg-red-50 border-red-300'
+                    : 'bg-white border-gray-200'
+                }`}
               >
                 <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h3 className="font-semibold text-lg">
-                      {enseignant.user?.nom} {enseignant.user?.prenom}
-                    </h3>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-semibold text-lg">
+                        {enseignant.user?.nom} {enseignant.user?.prenom}
+                      </h3>
+                      {enseignant.suspended && (
+                        <span className="px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded">
+                          SUSPENDED
+                        </span>
+                      )}
+                    </div>
                     <p className="text-sm text-gray-600">{enseignant.user?.email}</p>
                   </div>
                 </div>
-                <div>
+                <div className="mb-3">
                   {enseignant.Specialite && (
                     <p className="text-gray-700">
                       <span className="font-semibold">Spécialité:</span> {enseignant.Specialite}
@@ -189,6 +241,23 @@ export default function EnseignantPanel() {
                     <p className="text-gray-700">
                       <span className="font-semibold">Grade:</span> {enseignant.Grade}
                     </p>
+                  )}
+                </div>
+                <div className="flex justify-end">
+                  {enseignant.suspended ? (
+                    <button
+                      onClick={() => handleReactivate(enseignant.idUser)}
+                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition"
+                    >
+                      Reactivate
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleSuspend(enseignant.idUser)}
+                      className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded transition"
+                    >
+                      Suspend
+                    </button>
                   )}
                 </div>
               </div>

@@ -7,6 +7,7 @@ const transformEnseignant = (row) => ({
     idUser: row.idUser,
     Specialite: row.Specialite,
     Grade: row.Grade,
+    suspended: row.suspended || false,
     user: {
         idUser: row.idUser,
         nom: row.Nom,
@@ -156,6 +157,46 @@ const enseignantController = {
         } catch (err) {
             console.error('Error fetching teacher profile:', err);
             res.status(500).json({ message: err.message });
+        }
+    },
+
+    async suspend(req, res) {
+        try {
+            const { id } = req.params;
+            
+            const result = await pool.query(
+                'UPDATE "ENSEIGNANT" SET "suspended" = TRUE WHERE "idUser" = $1 RETURNING *',
+                [id]
+            );
+
+            if (!result.rows.length) {
+                return res.status(404).json({ message: 'Teacher not found' });
+            }
+
+            res.json({ message: 'Teacher suspended successfully' });
+        } catch (err) {
+            console.error('Error suspending teacher:', err);
+            res.status(500).json({ message: 'Error suspending teacher' });
+        }
+    },
+
+    async reactivate(req, res) {
+        try {
+            const { id } = req.params;
+            
+            const result = await pool.query(
+                'UPDATE "ENSEIGNANT" SET "suspended" = FALSE WHERE "idUser" = $1 RETURNING *',
+                [id]
+            );
+
+            if (!result.rows.length) {
+                return res.status(404).json({ message: 'Teacher not found' });
+            }
+
+            res.json({ message: 'Teacher reactivated successfully' });
+        } catch (err) {
+            console.error('Error reactivating teacher:', err);
+            res.status(500).json({ message: 'Error reactivating teacher' });
         }
     }
 };

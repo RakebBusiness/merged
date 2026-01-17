@@ -10,7 +10,11 @@ router.get('/pending', enseignantController.getPending);
 router.post('/approve/:id', enseignantController.approve);
 router.delete('/pending/:id', enseignantController.deletePending);
 
-// Profil complet d’un enseignant
+// Suspend / reactivate teachers
+router.post('/suspend/:id', enseignantController.suspend);
+router.post('/reactivate/:id', enseignantController.reactivate);
+
+// Profil complet d'un enseignant
 router.get('/profile/:id', enseignantController.getProfile);
 
 module.exports = router;

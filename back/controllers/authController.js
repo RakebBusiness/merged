@@ -51,6 +51,12 @@ const handleLogin = async (req, res) => {
                 // Check for enseignant
                 const enseignant = await enseignantModel.findById(foundUser.idUser);
                 if (enseignant) {
+                    // 🔥 Block login if teacher is suspended
+                    if (enseignant.suspended) {
+                        return res.status(403).json({
+                            error: "Your account has been suspended. Please contact the administrator."
+                        });
+                    }
                     userDetails = enseignant;
                     role = 'enseignant';
                 }
